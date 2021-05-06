@@ -112,16 +112,20 @@ public class WebScrapperTask extends TimerTask
        List<WebElement> selectorDivs = searchdistwrperDiv.findElements(By.className("pullleft"));
 
        WebElement stateSelectorBox = selectorDivs.get(0).findElement(By.tagName("mat-select"));
-        stateSelectorBox.click();
 
-       boolean stateFound = selectOption(stateName,"mat-select-0-panel");
+       String alreadyPresent = stateSelectorBox.findElement(By.className("mat-select-placeholder")).getText();
 
-       if(!stateFound)
+       if(!alreadyPresent.equalsIgnoreCase(stateName))
        {
-           throw new BotException("Unable to find state : '"+stateName+"'");
+           stateSelectorBox.click();
+
+           boolean stateFound = selectOption(stateName,"mat-select-0-panel");
+
+           if(!stateFound)
+           {
+               throw new BotException("Unable to find state : '"+stateName+"'");
+           }
        }
-
-
 
 
        WebElement districtSelectorBox = selectorDivs.get(1).findElement(By.tagName("mat-select"));
