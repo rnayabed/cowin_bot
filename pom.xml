@@ -34,7 +34,7 @@
         <search.vaccine.type>V_18_TO_44</search.vaccine.type>
 
 
-        <timeout.seconds>60</timeout.seconds>
+        <timeout.seconds>10</timeout.seconds>
         <repeat.millis>30000</repeat.millis>
 
         <javax.mail.version>1.6.2</javax.mail.version>

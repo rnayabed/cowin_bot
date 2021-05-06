@@ -121,7 +121,7 @@ public class WebScrapperTask extends TimerTask
     {
         getLogger().log(Level.INFO, "Selecting search by district ...");
 
-        WebElement statusSwitchElementDiv = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("status-switch")));
+        WebElement statusSwitchElementDiv = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("status-switch")));
 
         if(webDriver.findElements(By.className("mat-select-48")).size() == 0)
         {
@@ -143,7 +143,7 @@ public class WebScrapperTask extends TimerTask
 
     private void chooseStateDistrictAndType(String stateName, String districtName) throws BotException
     {
-        WebElement searchdistwrperDiv = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("searchdistwrper")));
+        WebElement searchdistwrperDiv = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("searchdistwrper")));
 
         List<WebElement> selectorDivs = searchdistwrperDiv.findElements(By.className("pullleft"));
 
@@ -204,7 +204,7 @@ public class WebScrapperTask extends TimerTask
 
     private void search()
     {
-        webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("searchdistwrper")))
+        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("searchdistwrper")))
                 .findElement(By.className("pinbtncover"))
                 .findElement(By.tagName("button"))
                 .click();
@@ -212,7 +212,7 @@ public class WebScrapperTask extends TimerTask
 
     private int selectOption(String option, String selectorIdName, int oldVal)
     {
-        WebElement selectorPanel = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id(selectorIdName)));
+        WebElement selectorPanel = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id(selectorIdName)));
 
         List<WebElement> options = selectorPanel.findElements(By.tagName("mat-option"));
 
@@ -267,7 +267,7 @@ public class WebScrapperTask extends TimerTask
 
     private void getAvailableVaccines(String stateName, String districtName)
     {
-        List<WebElement> dateElements = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("availability-date-ul")))
+        List<WebElement> dateElements = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("availability-date-ul")))
                 .findElement(By.className("carousel-inner"))
                 .findElements(By.tagName("slide"));
 
@@ -293,7 +293,7 @@ public class WebScrapperTask extends TimerTask
 
 
 
-        WebElement centersBox = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("center-box")))
+        WebElement centersBox = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("center-box")))
                 .findElement(By.tagName("div"))
                 .findElement(By.tagName("div"));
 
