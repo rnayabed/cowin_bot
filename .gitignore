@@ -1,4 +1,4 @@
-9+# Maven
+# Maven
 target/
 
 # IntelliJ IDEA
@@ -14,3 +14,7 @@ target/
 # Misc
 gen/
 data/
+
+#Config
+config
+config.1
