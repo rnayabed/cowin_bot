@@ -155,7 +155,7 @@
                         </systemProperty>
                         <systemProperty>
                             <key>bot.repo</key>
-                            <value>bot.repo</value>
+                            <value>${bot.repo}</value>
                         </systemProperty>
                     </systemProperties>
                 </configuration>

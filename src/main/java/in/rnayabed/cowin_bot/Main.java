@@ -18,8 +18,8 @@ public class Main
         {
             initLogger();
 
-            Logger.getLogger("in.rnayabed").info("cowin_bot "+System.getProperty("bot.version")+" by rnayabed (Debayan Sutradhar)\n" +
-                    "Source : "+System.getProperty("bot.source"));
+            Logger.getLogger("in.rnayabed").info("cowin_bot "+System.getProperty("bot.version")+"\n By rnayabed (Debayan Sutradhar)" +
+                    "\nSource : "+System.getProperty("bot.source"));
 
             new Timer().scheduleAtFixedRate(new WebScrapperTask(), 0,Long.parseLong(System.getProperty("repeat.millis")));
         }
