@@ -17,12 +17,11 @@ public class Main
         {
             initLogger();
 
-            Logger.getGlobal().log(Level.WARNING, "Logger Initialised! ");
-
-            new Timer().schedule(new WebScrapperTask("Sd"), 0);
+            new Timer().schedule(new WebScrapperTask(), 0);
         }
         catch (BotException e)
         {
+            e.printStackTrace();
             System.out.println("Quitting ...");
         }
     }
@@ -31,13 +30,13 @@ public class Main
     {
         try
         {
-            Logger logger = Logger.getGlobal();
+            Logger logger = Logger.getLogger("in.rnayabed");
             logger.setLevel(Level.ALL);
             logger.addHandler(new Handler("config"));
         }
         catch (Exception e)
         {
-            throw new BotException("Unable to start logger", e);
+            throw new BotException("Unable to start logger");
         }
     }
 }

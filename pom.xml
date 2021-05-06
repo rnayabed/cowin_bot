@@ -15,6 +15,25 @@
         <selenium.version>3.9.1</selenium.version>
 
         <main.class.name>in.rnayabed.cowin_bot.Main</main.class.name>
+
+        <gecko.driver.path>/run/media/rnayabed/HDD_1/code/tools/geckodriver</gecko.driver.path>
+        <cowin.website.url>https://www.cowin.gov.in/</cowin.website.url>
+
+        <search.state>West Bengal</search.state>
+        <search.district>Kolkata</search.district>
+        <search.vaccine.type>V_ALL</search.vaccine.type>
+
+
+        <javax.mail.version>1.6.2</javax.mail.version>
+
+        <mail.smtp.user>cowin_bot_rnayabed@gmail.com</mail.smtp.user>
+        <mail.smtp.user.pass></mail.smtp.user.pass>
+        <mail.smtp.to>debayansutradhar3@gmail.com</mail.smtp.to>
+        <mail.smtp.host>smtp.gmail.com</mail.smtp.host>
+        <mail.smtp.port>587</mail.smtp.port>
+
+        <mail.smtp.starttls.enable>true</mail.smtp.starttls.enable>
+        <mail.smtp.auth>true</mail.smtp.auth>
     </properties>
 
     <dependencies>
@@ -23,6 +42,13 @@
             <artifactId>selenium-java</artifactId>
             <version>${selenium.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+            <version>${javax.mail.version}</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
@@ -60,6 +86,28 @@
                 <version>3.0.0</version>
                 <configuration>
                     <mainClass>${main.class.name}</mainClass>
+                    <systemProperties>
+                        <systemProperty>
+                            <key>webdriver.gecko.driver</key>
+                            <value>${gecko.driver.path}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>cowin.website.url</key>
+                            <value>${cowin.website.url}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>search.state</key>
+                            <value>${search.state}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>search.district</key>
+                            <value>${search.district}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>search.vaccine.type</key>
+                            <value>${search.vaccine.type}</value>
+                        </systemProperty>
+                    </systemProperties>
                 </configuration>
             </plugin>
         </plugins>

@@ -4,14 +4,9 @@ public class BotException extends Exception
 {
     private final String title;
 
-    public BotException(Exception e)
+    public BotException(String title)
     {
-        this(e.getMessage(), e);
-    }
-
-    public BotException(String title, Exception e)
-    {
-        e.printStackTrace();
+        super(title);
         this.title = title;
     }
 
