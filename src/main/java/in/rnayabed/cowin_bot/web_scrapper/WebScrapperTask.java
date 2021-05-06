@@ -8,7 +8,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -35,21 +37,44 @@ public class WebScrapperTask extends TimerTask
 
         url = System.getProperty("cowin.website.url");
         state = System.getProperty("search.state").strip();
+
         districts = System.getProperty("search.districts").split(",");
+
+        for(int j = 0;j<districts.length;j++)
+        {
+            districts[j] = districts[j].strip();
+        }
+
+
+
+
         vaccineType = VaccineType.valueOf(System.getProperty("search.vaccine.type"));
 
 
         String browserChoice = System.getProperty("browser.choice").toLowerCase();
+        boolean runHeadless = System.getProperty("browser.run.headless").equalsIgnoreCase("true");
 
         if(browserChoice.equals("chrome") || browserChoice.equals("chromium"))
         {
             getLogger().log(Level.INFO, "Setting up chrome driver ...");
-            webDriver = new ChromeDriver();
+
+            ChromeOptions chromeOptions = new ChromeOptions();
+
+            if(runHeadless)
+                chromeOptions.addArguments("--headless");
+
+            webDriver = new ChromeDriver(chromeOptions);
         }
         else if (browserChoice.equals("firefox") || browserChoice.equals("gecko"))
         {
             getLogger().log(Level.INFO, "Setting up firefox driver ...");
-            webDriver = new FirefoxDriver();
+
+            FirefoxOptions firefoxOptions = new FirefoxOptions();
+
+            if(runHeadless)
+                firefoxOptions.addArguments("--headless");
+
+            webDriver = new FirefoxDriver(firefoxOptions);
         }
         else
         {
@@ -110,13 +135,13 @@ public class WebScrapperTask extends TimerTask
 
     private void chooseStateDistrictAndType(String stateName, String districtName) throws BotException
     {
-       WebElement searchdistwrperDiv = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("searchdistwrper")));
+        WebElement searchdistwrperDiv = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("searchdistwrper")));
 
-       List<WebElement> selectorDivs = searchdistwrperDiv.findElements(By.className("pullleft"));
+        List<WebElement> selectorDivs = searchdistwrperDiv.findElements(By.className("pullleft"));
 
-       WebElement stateSelectorBox = selectorDivs.get(0).findElement(By.tagName("mat-select"));
+        WebElement stateSelectorBox = selectorDivs.get(0).findElement(By.tagName("mat-select"));
 
-       String alreadyPresent = stateSelectorBox
+        String alreadyPresent = stateSelectorBox
                .findElement(By.tagName("div"))
                .findElement(By.tagName("div"))
                .findElement(By.tagName("span")).getText();
@@ -137,16 +162,16 @@ public class WebScrapperTask extends TimerTask
        WebElement districtSelectorBox = selectorDivs.get(1).findElement(By.tagName("mat-select"));
        districtSelectorBox.click();
 
-       int oldVal = districtHashMap.getOrDefault(districtName.strip(), -1);
+       int oldVal = districtHashMap.getOrDefault(districtName, -1);
 
-       int districtFound = selectOption(districtName.strip(),"mat-select-2-panel", oldVal);
+       int districtFound = selectOption(districtName,"mat-select-2-panel", oldVal);
 
         if(districtFound == -1)
         {
             throw new BotException("Unable to find district : '"+districtName+"'");
         }
 
-        districtHashMap.put(districtName.strip(), districtFound);
+        districtHashMap.put(districtName, districtFound);
 
 
 
@@ -234,9 +259,6 @@ public class WebScrapperTask extends TimerTask
 
     private void getAvailableVaccines(String stateName, String districtName)
     {
-        // first get dates
-
-
         List<WebElement> dateElements = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("availability-date-ul")))
                 .findElement(By.className("carousel-inner"))
                 .findElements(By.tagName("slide"));
@@ -271,7 +293,7 @@ public class WebScrapperTask extends TimerTask
 
         if(centersBoxElements.isEmpty())
         {
-            getLogger().info("No Vaccine available!");
+            getLogger().info("No Vaccine IN "+districtName+", "+stateName+"!");
             return;
         }
 
@@ -346,15 +368,15 @@ public class WebScrapperTask extends TimerTask
 
         if(vaccineFound)
         {
-            logger.info("VACCINE AVAILABLE IN "+districtName+", "+stateName+" ...");
+            getLogger().info("VACCINE AVAILABLE IN "+districtName+", "+stateName+" ...");
             new Timer().schedule(new Mail(stateName, districtName, vaccineHashMap), 0);
         }
         else
         {
-            logger.info("No Vaccine IN "+districtName+", "+stateName+"!");
+            getLogger().info("No Vaccine IN "+districtName+", "+stateName+"!");
         }
 
-        logger.info("Repeating after "+System.getProperty("repeat.millis")+" milis ...");
+        getLogger().info("Repeating after "+System.getProperty("repeat.millis")+" millis ...");
 
     }
 

@@ -6,21 +6,23 @@
 
     <groupId>in.rnayabed</groupId>
     <artifactId>cowin_bot</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
 
-        <bot.version>1.0.0</bot.version>
+        <bot.version>1.1.0</bot.version>
         <bot.repo>https://github.com/rnayabed/cowin_bot</bot.repo>
 
         <selenium.version>3.9.1</selenium.version>
 
         <main.class.name>in.rnayabed.cowin_bot.Main</main.class.name>
 
-        <gecko.driver.path>/run/media/rnayabed/HDD_1/code/tools/geckodriver</gecko.driver.path>
+        <gecko.driver.path>/home/rnayabed/Downloads/geckodriver</gecko.driver.path>
         <chrome.driver.path></chrome.driver.path>
+
+        <browser.run.headless>true</browser.run.headless>
 
         <browser.choice>firefox</browser.choice>
 
@@ -174,6 +176,10 @@
                         <systemProperty>
                             <key>browser.choice</key>
                             <value>${browser.choice}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>browser.run.headless</key>
+                            <value>${browser.run.headless}</value>
                         </systemProperty>
                     </systemProperties>
                 </configuration>

@@ -8,6 +8,8 @@ module in.rnayabed.cowin_bot
     requires selenium.api;
     requires selenium.support;
 
+
+
     requires javax.mail.api;
 
     exports in.rnayabed.cowin_bot;
