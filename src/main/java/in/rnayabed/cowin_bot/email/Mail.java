@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.TimerTask;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Mail extends TimerTask
@@ -93,14 +94,13 @@ public class Mail extends TimerTask
     {
         getLogger().info("Sending mail ...");
 
-        // Get the default Session object.
         Session session = Session.getDefaultInstance(System.getProperties());
 
-        try{
-            // Create a default MimeMessage object.
+        try
+        {
+
             MimeMessage message = new MimeMessage(session);
 
-            // Set From: header field of the header.
             message.setFrom(new InternetAddress(from));
 
 
@@ -112,24 +112,26 @@ public class Mail extends TimerTask
                 internetAddresses[i] = new InternetAddress(messages[i].strip());
             }
 
-            // Set To: header field of the header.
+
             message.addRecipients(Message.RecipientType.TO,
                     internetAddresses);
 
-            // Set Subject: header field
+
             message.setSubject("VACCINES AVAILABLE IN "+districtName+", "+stateName);
 
-            // Now set the actual message
+
             message.setText(getEmailBody(vaccineHashMap));
 
-            // Send message
+
             Transport transport = session.getTransport("smtp");
             transport.connect(host, from, pass);
             transport.sendMessage(message, message.getAllRecipients());
             transport.close();
             getLogger().info("... Done!");
-        }catch (MessagingException mex) {
-            mex.printStackTrace();
+        }
+        catch (MessagingException e)
+        {
+            getLogger().log(Level.SEVERE, e.getMessage(), e);
             getLogger().info("... Failed to send mail!");
         }
 

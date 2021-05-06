@@ -109,6 +109,7 @@ public class WebScrapperTask extends TimerTask
         }
         catch (Exception e)
         {
+            getLogger().log(Level.SEVERE, e.getMessage(), e);
             e.printStackTrace();
         }
     }
@@ -262,10 +263,9 @@ public class WebScrapperTask extends TimerTask
         }
         catch (Exception e)
         {
+            getLogger().log(Level.SEVERE, e.getMessage(), e);
             e.printStackTrace();
         }
-
-
     }
 
     private void getAvailableVaccines(String stateName, String districtName)

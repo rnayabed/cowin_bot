@@ -6,13 +6,13 @@
 
     <groupId>in.rnayabed</groupId>
     <artifactId>cowin_bot</artifactId>
-    <version>1.3.0</version>
+    <version>1.4.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
 
-        <bot.version>1.3.0</bot.version>
+        <bot.version>1.4.0</bot.version>
         <bot.repo>https://github.com/rnayabed/cowin_bot</bot.repo>
 
         <selenium.version>3.9.1</selenium.version>
@@ -24,7 +24,7 @@
 
         <browser.run.headless>true</browser.run.headless>
 
-        <browser.choice>chromium</browser.choice>
+        <browser.choice>firefox</browser.choice>
 
 
         <cowin.website.url>https://www.cowin.gov.in/</cowin.website.url>
@@ -40,7 +40,7 @@
         <javax.mail.version>1.6.2</javax.mail.version>
 
         <mail.smtp.user>cowin.bot.rnayabed@gmail.com</mail.smtp.user>
-        <mail.smtp.user.pass></mail.smtp.user.pass>
+        <mail.smtp.user.pass>ds@06052004</mail.smtp.user.pass>
         <mail.smtp.to>debayansutradhar3@gmail.com, gautambhel@gmail.com, debadityasx4prophet@gmail.com, shampasutradhar@gmail.com</mail.smtp.to>
         <mail.smtp.host>smtp.gmail.com</mail.smtp.host>
         <mail.smtp.port>587</mail.smtp.port>
