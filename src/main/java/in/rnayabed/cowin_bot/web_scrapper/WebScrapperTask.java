@@ -82,7 +82,7 @@ public class WebScrapperTask extends TimerTask
         }
 
 
-        webDriverWait = new WebDriverWait(webDriver, 10);
+        webDriverWait = new WebDriverWait(webDriver, Long.parseLong(System.getProperty("timeout.seconds")));
         getLogger().log(Level.INFO, "... Done!");
 
 

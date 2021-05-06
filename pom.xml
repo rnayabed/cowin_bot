@@ -20,11 +20,12 @@
         <main.class.name>in.rnayabed.cowin_bot.Main</main.class.name>
 
         <gecko.driver.path>/home/rnayabed/Downloads/geckodriver</gecko.driver.path>
-        <chrome.driver.path></chrome.driver.path>
+        <chrome.driver.path>/usr/bin/chromedriver</chrome.driver.path>
 
         <browser.run.headless>true</browser.run.headless>
 
-        <browser.choice>firefox</browser.choice>
+        <browser.choice>chromium</browser.choice>
+
 
         <cowin.website.url>https://www.cowin.gov.in/</cowin.website.url>
 
@@ -32,6 +33,8 @@
         <search.districts>South 24 Parganas, Kolkata</search.districts>
         <search.vaccine.type>V_18_TO_44</search.vaccine.type>
 
+
+        <timeout.seconds>60</timeout.seconds>
         <repeat.millis>30000</repeat.millis>
 
         <javax.mail.version>1.6.2</javax.mail.version>
@@ -180,6 +183,10 @@
                         <systemProperty>
                             <key>browser.run.headless</key>
                             <value>${browser.run.headless}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>timeout.seconds</key>
+                            <value>${timeout.seconds}</value>
                         </systemProperty>
                     </systemProperties>
                 </configuration>
