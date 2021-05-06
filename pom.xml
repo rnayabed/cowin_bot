@@ -20,6 +20,10 @@
         <main.class.name>in.rnayabed.cowin_bot.Main</main.class.name>
 
         <gecko.driver.path>/run/media/rnayabed/HDD_1/code/tools/geckodriver</gecko.driver.path>
+        <chrome.driver.path></chrome.driver.path>
+
+        <browser.choice>chrome</browser.choice>
+
         <cowin.website.url>https://www.cowin.gov.in/</cowin.website.url>
 
         <search.state>West Bengal</search.state>
@@ -69,6 +73,12 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-firefox-driver</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-chrome-driver</artifactId>
             <version>${selenium.version}</version>
         </dependency>
     </dependencies>
@@ -156,6 +166,10 @@
                         <systemProperty>
                             <key>bot.repo</key>
                             <value>${bot.repo}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>browser.choice</key>
+                            <value>${browser.choice}</value>
                         </systemProperty>
                     </systemProperties>
                 </configuration>

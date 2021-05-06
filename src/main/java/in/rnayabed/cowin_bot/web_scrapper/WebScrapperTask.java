@@ -7,6 +7,7 @@ import in.rnayabed.cowin_bot.vaccine.VaccineType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -35,8 +36,25 @@ public class WebScrapperTask extends TimerTask
         districts = System.getProperty("search.districts").split(",");
         vaccineType = VaccineType.valueOf(System.getProperty("search.vaccine.type"));
 
-        getLogger().log(Level.INFO, "Setting up firefox driver ...");
-        webDriver = new FirefoxDriver();
+
+        String browserChoice = System.getProperty("browser.choice").toLowerCase();
+
+        if(browserChoice.equals("chrome") || browserChoice.equals("chromium"))
+        {
+            getLogger().log(Level.INFO, "Setting up chrome driver ...");
+            webDriver = new ChromeDriver();
+        }
+        else if (browserChoice.equals("firefox"))
+        {
+            getLogger().log(Level.INFO, "Setting up firefox driver ...");
+            webDriver = new FirefoxDriver();
+        }
+        else
+        {
+            throw new IllegalArgumentException("browser.choice property is invalid ("+browserChoice+")");
+        }
+
+
         webDriverWait = new WebDriverWait(webDriver, 10);
         getLogger().log(Level.INFO, "... Done!");
 
