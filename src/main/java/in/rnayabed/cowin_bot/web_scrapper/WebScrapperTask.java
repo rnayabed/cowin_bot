@@ -64,7 +64,10 @@ public class WebScrapperTask extends TimerTask
             ChromeOptions chromeOptions = new ChromeOptions();
 
             if(runHeadless)
+            {
                 chromeOptions.addArguments("--headless");
+                chromeOptions.addArguments("--start-maximized");
+            }
 
             chromeOptions.addArguments("--window-size="+windowWidth+","+windowHeight);
 
