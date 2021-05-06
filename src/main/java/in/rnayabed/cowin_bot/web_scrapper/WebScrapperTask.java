@@ -31,6 +31,8 @@ public class WebScrapperTask extends TimerTask
     {
         logger = Logger.getLogger("in.rnayabed");
 
+        districtHashMap= new HashMap<>();
+
         url = System.getProperty("cowin.website.url");
         state = System.getProperty("search.state").strip();
         districts = System.getProperty("search.districts").split(",");
@@ -104,8 +106,7 @@ public class WebScrapperTask extends TimerTask
         }
     }
 
-    private int stateListIndex = -1;
-    private int districtListIndex = -1;
+    private HashMap<String, Integer> districtHashMap;
 
     private void chooseStateDistrictAndType(String stateName, String districtName) throws BotException
     {
@@ -124,29 +125,28 @@ public class WebScrapperTask extends TimerTask
        {
            stateSelectorBox.click();
 
-           int stateFound = selectOption(stateName,"mat-select-0-panel", stateListIndex);
+           int stateFound = selectOption(stateName,"mat-select-0-panel", -1);
 
            if(stateFound == -1)
            {
                throw new BotException("Unable to find state : '"+stateName+"'");
            }
-
-           stateListIndex = stateFound;
        }
 
 
        WebElement districtSelectorBox = selectorDivs.get(1).findElement(By.tagName("mat-select"));
        districtSelectorBox.click();
 
-        int districtFound = selectOption(districtName.strip(),"mat-select-2-panel", districtListIndex);
+       int oldVal = districtHashMap.getOrDefault(districtName.strip(), -1);
+
+       int districtFound = selectOption(districtName.strip(),"mat-select-2-panel", oldVal);
 
         if(districtFound == -1)
         {
             throw new BotException("Unable to find district : '"+districtName+"'");
         }
 
-        districtListIndex = districtFound;
-
+        districtHashMap.put(districtName.strip(), districtFound);
 
 
 
@@ -177,18 +177,17 @@ public class WebScrapperTask extends TimerTask
                 .click();
     }
 
-    private int selectOption(String option, String selectorIdName, int oldValue)
+    private int selectOption(String option, String selectorIdName, int oldVal)
     {
         WebElement selectorPanel = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id(selectorIdName)));
 
         List<WebElement> options = selectorPanel.findElements(By.tagName("mat-option"));
 
-        if(oldValue > -1)
+        if(oldVal > -1)
         {
-            options.get(oldValue).click();
-            return oldValue;
+            options.get(oldVal).click();
+            return oldVal;
         }
-
 
         int index = -1;
         for(int i = 0;i<options.size();i++)
