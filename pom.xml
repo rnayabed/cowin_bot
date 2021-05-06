@@ -45,6 +45,9 @@
         <mail.smtp.host>smtp.gmail.com</mail.smtp.host>
         <mail.smtp.port>587</mail.smtp.port>
 
+        <browser.window.width>1920</browser.window.width>
+        <browser.window.height>1080</browser.window.height>
+
         <mail.smtp.starttls.enable>true</mail.smtp.starttls.enable>
         <mail.smtp.auth>true</mail.smtp.auth>
     </properties>
@@ -187,6 +190,14 @@
                         <systemProperty>
                             <key>timeout.seconds</key>
                             <value>${timeout.seconds}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>browser.window.height</key>
+                            <value>${browser.window.height}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>browser.window.width</key>
+                            <value>${browser.window.width}</value>
                         </systemProperty>
                     </systemProperties>
                 </configuration>

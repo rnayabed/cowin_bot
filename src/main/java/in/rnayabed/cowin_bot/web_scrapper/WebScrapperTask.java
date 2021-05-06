@@ -54,6 +54,9 @@ public class WebScrapperTask extends TimerTask
         String browserChoice = System.getProperty("browser.choice").toLowerCase();
         boolean runHeadless = System.getProperty("browser.run.headless").equalsIgnoreCase("true");
 
+        String windowHeight = System.getProperty("browser.window.height").strip();
+        String windowWidth = System.getProperty("browser.window.width").strip();
+
         if(browserChoice.equals("chrome") || browserChoice.equals("chromium"))
         {
             getLogger().log(Level.INFO, "Setting up chrome driver ...");
@@ -63,6 +66,8 @@ public class WebScrapperTask extends TimerTask
             if(runHeadless)
                 chromeOptions.addArguments("--headless");
 
+            chromeOptions.addArguments("--window-size="+windowWidth+","+windowHeight);
+
             webDriver = new ChromeDriver(chromeOptions);
         }
         else if (browserChoice.equals("firefox") || browserChoice.equals("gecko"))
@@ -70,6 +75,9 @@ public class WebScrapperTask extends TimerTask
             getLogger().log(Level.INFO, "Setting up firefox driver ...");
 
             FirefoxOptions firefoxOptions = new FirefoxOptions();
+
+            firefoxOptions.addArguments("--width="+windowWidth);
+            firefoxOptions.addArguments("--height="+windowHeight);
 
             if(runHeadless)
                 firefoxOptions.addArguments("--headless");
