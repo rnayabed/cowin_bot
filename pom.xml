@@ -6,11 +6,14 @@
 
     <groupId>in.rnayabed</groupId>
     <artifactId>cowin_bot</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
+
+        <bot.version>1.0.0</bot.version>
+        <bot.repo>https://github.com/rnayabed/cowin_bot</bot.repo>
 
         <selenium.version>3.9.1</selenium.version>
 
@@ -20,15 +23,16 @@
         <cowin.website.url>https://www.cowin.gov.in/</cowin.website.url>
 
         <search.state>West Bengal</search.state>
-        <search.district>Kolkata</search.district>
+        <search.districts>Purulia</search.districts>
         <search.vaccine.type>V_ALL</search.vaccine.type>
 
+        <repeat.millis>30000</repeat.millis>
 
         <javax.mail.version>1.6.2</javax.mail.version>
 
-        <mail.smtp.user>cowin_bot_rnayabed@gmail.com</mail.smtp.user>
+        <mail.smtp.user>cowin.bot.rnayabed@gmail.com</mail.smtp.user>
         <mail.smtp.user.pass></mail.smtp.user.pass>
-        <mail.smtp.to>debayansutradhar3@gmail.com</mail.smtp.to>
+        <mail.smtp.to>debayansutradhar3@gmail.com, gautambhel@gmail.com, debadityasx4prophet@gmail.com, shampasutradhar@gmail.com</mail.smtp.to>
         <mail.smtp.host>smtp.gmail.com</mail.smtp.host>
         <mail.smtp.port>587</mail.smtp.port>
 
@@ -46,6 +50,12 @@
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>javax.mail-api</artifactId>
+            <version>${javax.mail.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
             <version>${javax.mail.version}</version>
         </dependency>
 
@@ -100,12 +110,52 @@
                             <value>${search.state}</value>
                         </systemProperty>
                         <systemProperty>
-                            <key>search.district</key>
-                            <value>${search.district}</value>
+                            <key>search.districts</key>
+                            <value>${search.districts}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>mail.smtp.user</key>
+                            <value>${mail.smtp.user}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>mail.smtp.user.pass</key>
+                            <value>${mail.smtp.user.pass}</value>
                         </systemProperty>
                         <systemProperty>
                             <key>search.vaccine.type</key>
                             <value>${search.vaccine.type}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>mail.smtp.to</key>
+                            <value>${mail.smtp.to}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>mail.smtp.host</key>
+                            <value>${mail.smtp.host}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>mail.smtp.port</key>
+                            <value>${mail.smtp.port}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>mail.smtp.starttls.enable</key>
+                            <value>${mail.smtp.starttls.enable}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>mail.smtp.auth</key>
+                            <value>${mail.smtp.auth}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>repeat.millis</key>
+                            <value>${repeat.millis}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>bot.version</key>
+                            <value>${bot.version}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>bot.repo</key>
+                            <value>bot.repo</value>
                         </systemProperty>
                     </systemProperties>
                 </configuration>

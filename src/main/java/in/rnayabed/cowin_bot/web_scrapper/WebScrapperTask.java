@@ -1,5 +1,6 @@
 package in.rnayabed.cowin_bot.web_scrapper;
 
+import in.rnayabed.cowin_bot.email.Mail;
 import in.rnayabed.cowin_bot.exception.BotException;
 import in.rnayabed.cowin_bot.vaccine.Vaccine;
 import in.rnayabed.cowin_bot.vaccine.VaccineType;
@@ -10,10 +11,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,7 +19,7 @@ public class WebScrapperTask extends TimerTask
 {
     private String url;
     private String state;
-    private String district;
+    private String[] districts;
     private VaccineType vaccineType;
 
     private WebDriver webDriver;
@@ -33,8 +31,8 @@ public class WebScrapperTask extends TimerTask
         logger = Logger.getLogger("in.rnayabed");
 
         url = System.getProperty("cowin.website.url");
-        state = System.getProperty("search.state");
-        district = System.getProperty("search.district");
+        state = System.getProperty("search.state").strip();
+        districts = System.getProperty("search.districts").split(",");
         vaccineType = VaccineType.valueOf(System.getProperty("search.vaccine.type"));
 
         getLogger().log(Level.INFO, "Setting up firefox driver ...");
@@ -47,7 +45,11 @@ public class WebScrapperTask extends TimerTask
         {
             loadCowinWebsite();
             selectSearchByDistrict();
-            chooseStateDistrictAndType();
+
+            if(districts.length == 1)
+            {
+                chooseStateDistrictAndType(state, districts[0]);
+            }
         }
         catch (Exception e)
         {
@@ -74,7 +76,18 @@ public class WebScrapperTask extends TimerTask
         }
     }
 
-    private void chooseStateDistrictAndType() throws BotException
+    private void chooseStateDistrictAndTypeAndFinallySearchAndGetAvailableVaccines(String stateName, String[] districts) throws BotException
+    {
+        for(String district : districts)
+        {
+            chooseStateDistrictAndType(stateName, district);
+            search();
+            getAvailableVaccines(stateName, district);
+        }
+    }
+
+
+    private void chooseStateDistrictAndType(String stateName, String districtName) throws BotException
     {
        WebElement searchdistwrperDiv = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("searchdistwrper")));
 
@@ -83,11 +96,11 @@ public class WebScrapperTask extends TimerTask
        WebElement stateSelectorBox = selectorDivs.get(0).findElement(By.tagName("mat-select"));
         stateSelectorBox.click();
 
-       boolean stateFound = selectOption(state,"mat-select-0-panel");
+       boolean stateFound = selectOption(stateName,"mat-select-0-panel");
 
        if(!stateFound)
        {
-           throw new BotException("Unable to find state : '"+state+"'");
+           throw new BotException("Unable to find state : '"+stateName+"'");
        }
 
 
@@ -96,11 +109,11 @@ public class WebScrapperTask extends TimerTask
        WebElement districtSelectorBox = selectorDivs.get(1).findElement(By.tagName("mat-select"));
        districtSelectorBox.click();
 
-       boolean districtFound = selectOption(district,"mat-select-2-panel");
+       boolean districtFound = selectOption(districtName.strip(),"mat-select-2-panel");
 
        if(!districtFound)
        {
-           throw new BotException("Unable to find district : '"+district+"'");
+           throw new BotException("Unable to find district : '"+districtName+"'");
        }
 
 
@@ -156,14 +169,27 @@ public class WebScrapperTask extends TimerTask
     @Override
     public void run()
     {
-        search();
+        try
+        {
+            if(districts.length > 1)
+            {
+                chooseStateDistrictAndTypeAndFinallySearchAndGetAvailableVaccines(state, districts);
+            }
+            else
+            {
+                search();
+                getAvailableVaccines(state, districts[0]);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
-
-        getAvailableVaccines();
 
     }
 
-    private void getAvailableVaccines()
+    private void getAvailableVaccines(String stateName, String districtName)
     {
         // first get dates
 
@@ -277,13 +303,15 @@ public class WebScrapperTask extends TimerTask
 
         if(vaccineFound)
         {
-            logger.info("Vaccines Available! ");
-            logger.info("Sending vaccine details to email !");
+            logger.info("VACCINE AVAILABLE IN "+districtName+", "+stateName+" ...");
+            new Timer().schedule(new Mail(stateName, districtName, vaccineHashMap), 0);
         }
         else
         {
-            logger.info("No Vaccines Found!");
+            logger.info("No Vaccine IN "+districtName+", "+stateName+"!");
         }
+
+        logger.info("Repeating after "+System.getProperty("repeat.millis")+" milis ...");
 
     }
 

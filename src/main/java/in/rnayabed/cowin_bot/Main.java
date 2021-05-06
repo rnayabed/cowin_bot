@@ -11,13 +11,17 @@ import java.util.logging.Logger;
 
 public class Main
 {
+
     public static void main(String[] args) 
     {
         try
         {
             initLogger();
 
-            new Timer().schedule(new WebScrapperTask(), 0);
+            Logger.getLogger("in.rnayabed").info("cowin_bot "+System.getProperty("bot.version")+" by rnayabed (Debayan Sutradhar)\n" +
+                    "Source : "+System.getProperty("bot.source"));
+
+            new Timer().scheduleAtFixedRate(new WebScrapperTask(), 0,Long.parseLong(System.getProperty("repeat.millis")));
         }
         catch (BotException e)
         {

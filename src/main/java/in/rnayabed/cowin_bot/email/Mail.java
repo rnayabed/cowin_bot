@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.TimerTask;
+import java.util.logging.Logger;
 
 public class Mail extends TimerTask
 {
@@ -22,10 +23,18 @@ public class Mail extends TimerTask
     private String to;
     private String host;
 
+    private String stateName, districtName;
 
-    public Mail(HashMap<String, ArrayList<Vaccine>> vaccineHashMap)
+    private String body;
+
+    public Mail(String stateName, String districtName, HashMap<String, ArrayList<Vaccine>> vaccineHashMap)
     {
         this.vaccineHashMap = vaccineHashMap;
+        this.stateName = stateName;
+        this.districtName = districtName;
+        this.body = getEmailBody(vaccineHashMap);
+
+        logger = Logger.getLogger("in.rnayabed");
 
         from = System.getProperty("mail.smtp.user");
         pass = System.getProperty("mail.smtp.user.pass");
@@ -42,11 +51,14 @@ public class Mail extends TimerTask
 
         for(String date : vaccineHashMap.keySet())
         {
+            ArrayList<Vaccine> vaccines = vaccineHashMap.get(date);
+
+            if(vaccines.size() == 0)
+                continue;
+
             stringBuilder.append("Date : ").append(date);
 
             stringBuilder.append("\n\n");
-
-            ArrayList<Vaccine> vaccines = vaccineHashMap.get(date);
 
             for(int i = 0;i< vaccines.size();i++)
             {
@@ -57,21 +69,30 @@ public class Mail extends TimerTask
                         .append("Center Address: ").append(vaccine.getCenterAddress()).append("\n")
                         .append("Vaccine Name: ").append(vaccine.getVaccineName()).append("\n")
                         .append("Amount Left: ").append(vaccine.getAmountLeft()).append("\n")
-                        .append("Age Limit: ").append(vaccine.getAgeLimit()).append("\n\n");
+                        .append("Limit: ").append(vaccine.getAgeLimit()).append("\n\n");
             }
 
             stringBuilder.append("\n\n\n");
         }
 
-        stringBuilder.append("\n\ncowin_bot by rnayabed (Debayan Sutradhar)");
+        stringBuilder.append("\n\ncowin_bot by rnayabed (Debayan Sutradhar)\n")
+                .append("Version: ").append(System.getProperty("bot.version"))
+                .append("\nSource: ").append(System.getProperty("bot.repo"));
 
         return stringBuilder.toString();
     }
 
+    private Logger logger;
+    private Logger getLogger()
+    {
+        return logger;
+    }
 
     @Override
     public void run()
     {
+        getLogger().info("Sending mail ...");
+
         // Get the default Session object.
         Session session = Session.getDefaultInstance(System.getProperties());
 
@@ -82,12 +103,21 @@ public class Mail extends TimerTask
             // Set From: header field of the header.
             message.setFrom(new InternetAddress(from));
 
+
+            String[] messages = to.split(",");
+
+            InternetAddress[] internetAddresses = new InternetAddress[messages.length];
+            for (int i = 0;i<messages.length;i++)
+            {
+                internetAddresses[i] = new InternetAddress(messages[i].strip());
+            }
+
             // Set To: header field of the header.
-            message.addRecipient(Message.RecipientType.TO,
-                    new InternetAddress(to));
+            message.addRecipients(Message.RecipientType.TO,
+                    internetAddresses);
 
             // Set Subject: header field
-            message.setSubject("VACCINES AVAILABLE!");
+            message.setSubject("VACCINES AVAILABLE IN "+districtName+", "+stateName);
 
             // Now set the actual message
             message.setText(getEmailBody(vaccineHashMap));
@@ -97,9 +127,10 @@ public class Mail extends TimerTask
             transport.connect(host, from, pass);
             transport.sendMessage(message, message.getAllRecipients());
             transport.close();
-            System.out.println("Sent message successfully....");
+            getLogger().info("... Done!");
         }catch (MessagingException mex) {
             mex.printStackTrace();
+            getLogger().info("... Failed to send mail!");
         }
 
     }
