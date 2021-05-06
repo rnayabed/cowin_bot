@@ -44,7 +44,7 @@ public class WebScrapperTask extends TimerTask
             getLogger().log(Level.INFO, "Setting up chrome driver ...");
             webDriver = new ChromeDriver();
         }
-        else if (browserChoice.equals("firefox"))
+        else if (browserChoice.equals("firefox") || browserChoice.equals("gecko"))
         {
             getLogger().log(Level.INFO, "Setting up firefox driver ...");
             webDriver = new FirefoxDriver();
@@ -104,6 +104,8 @@ public class WebScrapperTask extends TimerTask
         }
     }
 
+    private int stateListIndex = -1;
+    private int districtListIndex = -1;
 
     private void chooseStateDistrictAndType(String stateName, String districtName) throws BotException
     {
@@ -113,30 +115,41 @@ public class WebScrapperTask extends TimerTask
 
        WebElement stateSelectorBox = selectorDivs.get(0).findElement(By.tagName("mat-select"));
 
-       String alreadyPresent = stateSelectorBox.findElement(By.className("mat-select-placeholder")).getText();
+       String alreadyPresent = stateSelectorBox
+               .findElement(By.tagName("div"))
+               .findElement(By.tagName("div"))
+               .findElement(By.tagName("span")).getText();
 
        if(!alreadyPresent.equalsIgnoreCase(stateName))
        {
            stateSelectorBox.click();
 
-           boolean stateFound = selectOption(stateName,"mat-select-0-panel");
+           int stateFound = selectOption(stateName,"mat-select-0-panel", stateListIndex);
 
-           if(!stateFound)
+           if(stateFound == -1)
            {
                throw new BotException("Unable to find state : '"+stateName+"'");
            }
+
+           stateListIndex = stateFound;
        }
 
 
        WebElement districtSelectorBox = selectorDivs.get(1).findElement(By.tagName("mat-select"));
        districtSelectorBox.click();
 
-       boolean districtFound = selectOption(districtName.strip(),"mat-select-2-panel");
+        int districtFound = selectOption(districtName.strip(),"mat-select-2-panel", districtListIndex);
 
-       if(!districtFound)
-       {
-           throw new BotException("Unable to find district : '"+districtName+"'");
-       }
+        if(districtFound == -1)
+        {
+            throw new BotException("Unable to find district : '"+districtName+"'");
+        }
+
+        districtListIndex = districtFound;
+
+
+
+
 
 
 
@@ -164,26 +177,35 @@ public class WebScrapperTask extends TimerTask
                 .click();
     }
 
-    private boolean selectOption(String option, String selectorIdName)
+    private int selectOption(String option, String selectorIdName, int oldValue)
     {
         WebElement selectorPanel = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id(selectorIdName)));
 
         List<WebElement> options = selectorPanel.findElements(By.tagName("mat-option"));
 
-        boolean optionFound = false;
-        for(WebElement eachOption : options)
+        if(oldValue > -1)
         {
+            options.get(oldValue).click();
+            return oldValue;
+        }
+
+
+        int index = -1;
+        for(int i = 0;i<options.size();i++)
+        {
+            WebElement eachOption = options.get(i);
+
             WebElement span = eachOption.findElement(By.className("mat-option-text"));
 
             if(span.getText().equalsIgnoreCase(option))
             {
                 eachOption.click();
-                optionFound = true;
+                index = i;
                 break;
             }
         }
 
-        return optionFound;
+        return index;
     }
 
 

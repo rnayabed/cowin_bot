@@ -22,13 +22,13 @@
         <gecko.driver.path>/run/media/rnayabed/HDD_1/code/tools/geckodriver</gecko.driver.path>
         <chrome.driver.path></chrome.driver.path>
 
-        <browser.choice>chrome</browser.choice>
+        <browser.choice>firefox</browser.choice>
 
         <cowin.website.url>https://www.cowin.gov.in/</cowin.website.url>
 
         <search.state>West Bengal</search.state>
-        <search.districts>Purulia</search.districts>
-        <search.vaccine.type>V_ALL</search.vaccine.type>
+        <search.districts>South 24 Parganas, Kolkata</search.districts>
+        <search.vaccine.type>V_18_TO_44</search.vaccine.type>
 
         <repeat.millis>30000</repeat.millis>
 
@@ -110,6 +110,10 @@
                         <systemProperty>
                             <key>webdriver.gecko.driver</key>
                             <value>${gecko.driver.path}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>webdriver.chrome.driver</key>
+                            <value>${chrome.driver.path}</value>
                         </systemProperty>
                         <systemProperty>
                             <key>cowin.website.url</key>

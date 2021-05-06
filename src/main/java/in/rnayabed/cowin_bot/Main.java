@@ -19,7 +19,7 @@ public class Main
             initLogger();
 
             Logger.getLogger("in.rnayabed").info("cowin_bot "+System.getProperty("bot.version")+"\n By rnayabed (Debayan Sutradhar)" +
-                    "\nSource : "+System.getProperty("bot.source"));
+                    "\nSource : "+System.getProperty("bot.repo"));
 
             new Timer().scheduleAtFixedRate(new WebScrapperTask(), 0,Long.parseLong(System.getProperty("repeat.millis")));
         }
