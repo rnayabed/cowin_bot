@@ -1,0 +1,43 @@
+.root
+{
+    -fx-font-family: 'SF Pro Text';
+    -fx-background-color: black;
+    -fx-text-fill:white;
+
+}
+
+Label
+{
+    -fx-text-fill:white;
+    -fx-font-size:1em;
+}
+
+.chart-pie-label {
+
+    -fx-font-family: 'SF Pro Text';
+    -fx-fill: white;
+}
+
+.chart-pie {
+    -fx-border-color: black;
+}
+
+.list-view .list-cell:even {
+    -fx-background-color: black;
+    -fx-text-fill: white;
+}
+.list-view .list-cell:odd {
+    -fx-background-color: black;
+    -fx-text-fill: white;
+}
+
+.details-pane
+{
+    -fx-background-color: black;
+}
+
+.scroll-pane
+{
+    -fx-background: black;
+    -fx-border-color: black;
+}
