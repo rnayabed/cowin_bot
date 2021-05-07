@@ -6,13 +6,13 @@
 
     <groupId>in.rnayabed</groupId>
     <artifactId>cowin_bot</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
 
-        <bot.version>1.4.0</bot.version>
+        <bot.version>1.5.0</bot.version>
         <bot.repo>https://github.com/rnayabed/cowin_bot</bot.repo>
 
         <selenium.version>3.9.1</selenium.version>
@@ -22,7 +22,7 @@
         <gecko.driver.path>/home/rnayabed/Downloads/geckodriver</gecko.driver.path>
         <chrome.driver.path>/usr/bin/chromedriver</chrome.driver.path>
 
-        <browser.run.headless>true</browser.run.headless>
+        <browser.run.headless>false</browser.run.headless>
 
         <browser.choice>firefox</browser.choice>
 
@@ -31,7 +31,8 @@
 
         <search.state>West Bengal</search.state>
         <search.districts>South 24 Parganas, Kolkata</search.districts>
-        <search.vaccine.type>V_18_TO_44</search.vaccine.type>
+
+        <search.filters>AGE_18_PLUS, AGE_45_PLUS, COVISHIELD, COVAXIN, FREE, PAID</search.filters>
 
 
         <timeout.seconds>10</timeout.seconds>
@@ -144,10 +145,6 @@
                             <value>${mail.smtp.user.pass}</value>
                         </systemProperty>
                         <systemProperty>
-                            <key>search.vaccine.type</key>
-                            <value>${search.vaccine.type}</value>
-                        </systemProperty>
-                        <systemProperty>
                             <key>mail.smtp.to</key>
                             <value>${mail.smtp.to}</value>
                         </systemProperty>
@@ -198,6 +195,10 @@
                         <systemProperty>
                             <key>browser.window.width</key>
                             <value>${browser.window.width}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>search.filters</key>
+                            <value>${search.filters}</value>
                         </systemProperty>
                     </systemProperties>
                 </configuration>

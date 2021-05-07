@@ -2,8 +2,8 @@ package in.rnayabed.cowin_bot.web_scrapper;
 
 import in.rnayabed.cowin_bot.email.Mail;
 import in.rnayabed.cowin_bot.exception.BotException;
+import in.rnayabed.cowin_bot.vaccine.Filter;
 import in.rnayabed.cowin_bot.vaccine.Vaccine;
-import in.rnayabed.cowin_bot.vaccine.VaccineType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -23,10 +23,11 @@ public class WebScrapperTask extends TimerTask
     private String url;
     private String state;
     private String[] districts;
-    private VaccineType vaccineType;
 
     private WebDriver webDriver;
     private WebDriverWait webDriverWait;
+
+    private Filter[] filters;
 
 
     public WebScrapperTask()
@@ -47,9 +48,13 @@ public class WebScrapperTask extends TimerTask
 
 
 
+        String[] tmpFilters = System.getProperty("search.filters").split(",");
 
-        vaccineType = VaccineType.valueOf(System.getProperty("search.vaccine.type"));
-
+        filters = new Filter[tmpFilters.length];
+        for(int j = 0;j<tmpFilters.length;j++)
+        {
+            filters[j] = Filter.valueOf(tmpFilters[j].strip());
+        }
 
         String browserChoice = System.getProperty("browser.choice").toLowerCase();
         boolean runHeadless = System.getProperty("browser.run.headless").equalsIgnoreCase("true");
@@ -186,25 +191,14 @@ public class WebScrapperTask extends TimerTask
         districtHashMap.put(districtName, districtFound);
 
 
-
-
-
-
-
-       WebElement ageFilterBlock = searchdistwrperDiv.findElement(By.className("agefilterblock"));
-
-       List<WebElement> choices = ageFilterBlock.findElements(By.className("form-check"));
-
-       if(vaccineType == VaccineType.V_ALL)
-           choices.get(1).click();
-       else if(vaccineType == VaccineType.V_18_TO_44)
-           choices.get(2).click();
-       else if(vaccineType == VaccineType.V_45_PLUS)
-           choices.get(3).click();
-
-
-
     }
+
+    WebElement age18PlusFilterWebElement = null;
+    WebElement age45PlusFilterWebElement = null;
+    WebElement covishieldFilterWebElement = null;
+    WebElement covaxinFilterWebElement = null;
+    WebElement freeFilterWebElement = null;
+    WebElement paidFilterWebElement = null;
 
     private void search()
     {
@@ -212,6 +206,42 @@ public class WebScrapperTask extends TimerTask
                 .findElement(By.className("pinbtncover"))
                 .findElement(By.tagName("button"))
                 .click();
+
+
+
+
+        if(age18PlusFilterWebElement == null)
+        {
+            WebElement filtersBlock = webDriver.findElement(By.className("agefilterblock"));
+
+            List<WebElement> filters = filtersBlock.findElements(By.className("form-check-label"));
+
+            logger.info("Not required ...");
+
+            age18PlusFilterWebElement = filters.get(0);
+            age45PlusFilterWebElement = filters.get(1);
+            covishieldFilterWebElement = filters.get(2);
+            covaxinFilterWebElement = filters.get(3);
+            freeFilterWebElement = filters.get(4);
+            paidFilterWebElement = filters.get(5);
+        }
+
+
+        for(Filter filter : filters)
+        {
+            if(filter == Filter.AGE_18_PLUS)
+                age18PlusFilterWebElement.click();
+            else if(filter == Filter.AGE_45_PLUS)
+                age45PlusFilterWebElement.click();
+            else if (filter == Filter.COVISHIELD)
+                covishieldFilterWebElement.click();
+            else if(filter == Filter.COVAXIN)
+                covaxinFilterWebElement.click();
+            else if(filter == Filter.FREE)
+                freeFilterWebElement.click();
+            else if(filter == Filter.PAID)
+                paidFilterWebElement.click();
+        }
     }
 
     private int selectOption(String option, String selectorIdName, int oldVal)
