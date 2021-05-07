@@ -216,8 +216,6 @@ public class WebScrapperTask extends TimerTask
 
             List<WebElement> filters = filtersBlock.findElements(By.className("form-check-label"));
 
-            logger.info("Not required ...");
-
             age18PlusFilterWebElement = filters.get(0);
             age45PlusFilterWebElement = filters.get(1);
             covishieldFilterWebElement = filters.get(2);
