@@ -217,7 +217,7 @@ public class WebScrapperTask extends TimerTask
 
         if(age18PlusFilterWebElement == null)
         {
-            WebElement filtersBlock = webDriver.findElement(By.className("agefilterblock"));
+            WebElement filtersBlock = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("agefilterblock")));
 
             List<WebElement> filters = filtersBlock.findElements(By.className("form-check-label"));
 
