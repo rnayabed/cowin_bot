@@ -6,13 +6,13 @@
 
     <groupId>in.rnayabed</groupId>
     <artifactId>cowin_bot</artifactId>
-    <version>1.5.0</version>
+    <version>1.6.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
 
-        <bot.version>1.5.0</bot.version>
+        <bot.version>1.6.0</bot.version>
         <bot.repo>https://github.com/rnayabed/cowin_bot</bot.repo>
 
         <selenium.version>3.9.1</selenium.version>

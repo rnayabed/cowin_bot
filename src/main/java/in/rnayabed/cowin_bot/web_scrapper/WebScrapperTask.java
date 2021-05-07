@@ -152,36 +152,40 @@ public class WebScrapperTask extends TimerTask
 
     private void chooseStateDistrictAndType(String stateName, String districtName) throws BotException
     {
-        WebElement searchdistwrperDiv = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("searchdistwrper")));
 
-        List<WebElement> selectorDivs = searchdistwrperDiv.findElements(By.className("pullleft"));
+        if(stateSelectorBox == null)
+        {
+            WebElement searchdistwrperDiv = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("searchdistwrper")));
+            List<WebElement> selectorDivs = searchdistwrperDiv.findElements(By.className("pullleft"));
 
-        WebElement stateSelectorBox = selectorDivs.get(0).findElement(By.tagName("mat-select"));
+            stateSelectorBox = selectorDivs.get(0).findElement(By.tagName("mat-select"));
+            districtSelectorBox = selectorDivs.get(1).findElement(By.tagName("mat-select"));
+        }
 
         String alreadyPresent = stateSelectorBox
                .findElement(By.tagName("div"))
                .findElement(By.tagName("div"))
                .findElement(By.tagName("span")).getText();
 
-       if(!alreadyPresent.equalsIgnoreCase(stateName))
-       {
-           stateSelectorBox.click();
 
-           int stateFound = selectOption(stateName,"mat-select-0-panel", -1);
+        if(!alreadyPresent.equalsIgnoreCase(stateName))
+        {
+            stateSelectorBox.click();
 
-           if(stateFound == -1)
-           {
-               throw new BotException("Unable to find state : '"+stateName+"'");
-           }
-       }
+            int stateFound = selectOption(stateName,"mat-select-0-panel", -1);
+
+            if(stateFound == -1)
+            {
+                throw new BotException("Unable to find state : '"+stateName+"'");
+            }
+        }
 
 
-       WebElement districtSelectorBox = selectorDivs.get(1).findElement(By.tagName("mat-select"));
-       districtSelectorBox.click();
+        districtSelectorBox.click();
 
-       int oldVal = districtHashMap.getOrDefault(districtName, -1);
+        int oldVal = districtHashMap.getOrDefault(districtName, -1);
 
-       int districtFound = selectOption(districtName,"mat-select-2-panel", oldVal);
+        int districtFound = selectOption(districtName,"mat-select-2-panel", oldVal);
 
         if(districtFound == -1)
         {
@@ -189,16 +193,17 @@ public class WebScrapperTask extends TimerTask
         }
 
         districtHashMap.put(districtName, districtFound);
-
-
     }
 
-    WebElement age18PlusFilterWebElement = null;
-    WebElement age45PlusFilterWebElement = null;
-    WebElement covishieldFilterWebElement = null;
-    WebElement covaxinFilterWebElement = null;
-    WebElement freeFilterWebElement = null;
-    WebElement paidFilterWebElement = null;
+    private WebElement stateSelectorBox = null;
+    private WebElement districtSelectorBox = null;
+
+    private WebElement age18PlusFilterWebElement = null;
+    private WebElement age45PlusFilterWebElement = null;
+    private WebElement covishieldFilterWebElement = null;
+    private WebElement covaxinFilterWebElement = null;
+    private WebElement freeFilterWebElement = null;
+    private WebElement paidFilterWebElement = null;
 
     private void search()
     {
