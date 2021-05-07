@@ -32,7 +32,7 @@
         <search.state>West Bengal</search.state>
         <search.districts>South 24 Parganas, Kolkata</search.districts>
 
-        <search.filters>AGE_18_PLUS, AGE_45_PLUS, COVISHIELD, COVAXIN, FREE, PAID</search.filters>
+        <search.filters>AGE_18_PLUS</search.filters>
 
 
         <timeout.seconds>10</timeout.seconds>

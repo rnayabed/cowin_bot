@@ -18,10 +18,10 @@ public class Main
         {
             initLogger();
 
-            Logger.getLogger("in.rnayabed").info("cowin_bot "+System.getProperty("bot.version")+"\n By rnayabed (Debayan Sutradhar)" +
+            Logger.getLogger("in.rnayabed").info("cowin_bot "+System.getProperty("bot.version")+"\nBy rnayabed (Debayan Sutradhar)" +
                     "\nSource : "+System.getProperty("bot.repo"));
 
-            new Timer().scheduleAtFixedRate(new WebScrapperTask(), 0,Long.parseLong(System.getProperty("repeat.millis")));
+            new Timer().scheduleAtFixedRate(new WebScrapperTask(), 0, Long.parseLong(System.getProperty("repeat.millis")));
         }
         catch (BotException e)
         {
@@ -36,7 +36,7 @@ public class Main
         {
             Logger logger = Logger.getLogger("in.rnayabed");
             logger.setLevel(Level.ALL);
-            logger.addHandler(new Handler("config"));
+            logger.addHandler(new Handler("cowin_bot_log"));
         }
         catch (Exception e)
         {
