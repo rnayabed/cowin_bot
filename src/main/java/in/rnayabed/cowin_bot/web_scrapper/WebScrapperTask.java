@@ -382,6 +382,9 @@ public class WebScrapperTask extends TimerTask
                     getAvailableVaccines(pins[0]);
             }
 
+
+
+            getLogger().info("Repeating after "+System.getProperty("repeat.millis")+" millis ...");
         }
         catch (Exception e)
         {
@@ -596,9 +599,6 @@ public class WebScrapperTask extends TimerTask
                 getLogger().info("No Vaccine IN "+pinCode+" ...");
             }
         }
-
-        getLogger().info("Repeating after "+System.getProperty("repeat.millis")+" millis ...");
-
     }
 
     private final Logger logger;
