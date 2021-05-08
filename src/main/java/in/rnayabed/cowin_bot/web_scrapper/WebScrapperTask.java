@@ -377,8 +377,6 @@ public class WebScrapperTask extends TimerTask
                     vaccineHashMap.put(date, new ArrayList<>());
                 }
 
-                logger.info("'"+dateLimit+"' '"+date+"' aosudhasuiodhasuidh");
-
                 if(dateLimit.equals(date))
                 {
                     dateReached = true;
