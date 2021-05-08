@@ -6,14 +6,15 @@
 
     <groupId>in.rnayabed</groupId>
     <artifactId>cowin_bot</artifactId>
-    <version>1.6.0</version>
+    <version>1.7.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
 
-        <bot.version>1.6.1</bot.version>
+        <bot.version>1.7.0</bot.version>
         <bot.repo>https://github.com/rnayabed/cowin_bot</bot.repo>
+
 
         <selenium.version>3.9.1</selenium.version>
 
@@ -31,9 +32,8 @@
 
         <search.state>West Bengal</search.state>
         <search.districts>South 24 Parganas, Kolkata</search.districts>
-
+        <search.date.limit>10 May 2021</search.date.limit> <!--Example:6 May 2021-->
         <search.filters>AGE_18_PLUS</search.filters>
-
 
         <timeout.seconds>10</timeout.seconds>
         <repeat.millis>30000</repeat.millis>
@@ -199,6 +199,10 @@
                         <systemProperty>
                             <key>search.filters</key>
                             <value>${search.filters}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>search.date.limit</key>
+                            <value>${search.date.limit}</value>
                         </systemProperty>
                     </systemProperties>
                 </configuration>

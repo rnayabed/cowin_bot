@@ -15,6 +15,5 @@ target/
 gen/
 data/
 
-#Config
-config
-config.1
+#Log
+cowin_bot_log

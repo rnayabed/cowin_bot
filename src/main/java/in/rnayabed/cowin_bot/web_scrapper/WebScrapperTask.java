@@ -23,16 +23,18 @@ public class WebScrapperTask extends TimerTask
     private String url;
     private String state;
     private String[] districts;
+    private String dateLimit;
 
     private WebDriver webDriver;
     private WebDriverWait webDriverWait;
 
-    private Filter[] filters;
-
+    private Filter[] filters = null;
 
     public WebScrapperTask()
     {
         logger = Logger.getLogger("in.rnayabed");
+
+        dateLimit = System.getProperty("search.date.limit").strip();
 
         districtHashMap= new HashMap<>();
 
@@ -48,13 +50,17 @@ public class WebScrapperTask extends TimerTask
 
 
 
-        String[] tmpFilters = System.getProperty("search.filters").split(",");
-
-        filters = new Filter[tmpFilters.length];
-        for(int j = 0;j<tmpFilters.length;j++)
+        if(!System.getProperty("search.filters").isBlank())
         {
-            filters[j] = Filter.valueOf(tmpFilters[j].strip());
+            String[] tmpFilters = System.getProperty("search.filters").split(",");
+
+            filters = new Filter[tmpFilters.length];
+            for(int j = 0;j<tmpFilters.length;j++)
+            {
+                filters[j] = Filter.valueOf(tmpFilters[j].strip());
+            }
         }
+
 
         String browserChoice = System.getProperty("browser.choice").toLowerCase();
         boolean runHeadless = System.getProperty("browser.run.headless").equalsIgnoreCase("true");
@@ -230,20 +236,23 @@ public class WebScrapperTask extends TimerTask
         }
 
 
-        for(Filter filter : filters)
+        if(filters != null)
         {
-            if(filter == Filter.AGE_18_PLUS)
-                age18PlusFilterWebElement.click();
-            else if(filter == Filter.AGE_45_PLUS)
-                age45PlusFilterWebElement.click();
-            else if (filter == Filter.COVISHIELD)
-                covishieldFilterWebElement.click();
-            else if(filter == Filter.COVAXIN)
-                covaxinFilterWebElement.click();
-            else if(filter == Filter.FREE)
-                freeFilterWebElement.click();
-            else if(filter == Filter.PAID)
-                paidFilterWebElement.click();
+            for(Filter filter : filters)
+            {
+                if(filter == Filter.AGE_18_PLUS)
+                    age18PlusFilterWebElement.click();
+                else if(filter == Filter.AGE_45_PLUS)
+                    age45PlusFilterWebElement.click();
+                else if (filter == Filter.COVISHIELD)
+                    covishieldFilterWebElement.click();
+                else if(filter == Filter.COVAXIN)
+                    covaxinFilterWebElement.click();
+                else if(filter == Filter.FREE)
+                    freeFilterWebElement.click();
+                else if(filter == Filter.PAID)
+                    paidFilterWebElement.click();
+            }
         }
     }
 
@@ -301,113 +310,160 @@ public class WebScrapperTask extends TimerTask
         }
     }
 
+    int stepCount = 0;
+
     private void getAvailableVaccines(String stateName, String districtName)
     {
-        List<WebElement> dateElements = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("availability-date-ul")))
-                .findElement(By.className("carousel-inner"))
-                .findElements(By.tagName("slide"));
+        WebElement availabilityDateUl = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("availability-date-ul")));
 
 
-        HashMap<String, ArrayList<Vaccine>> vaccineHashMap = new HashMap<>();
-
-        ArrayList<String> dates = new ArrayList<>();
-
-        for(WebElement eachDateElement : dateElements)
+        if(nextButton == null)
         {
-            String date = eachDateElement.findElement(By.tagName("p")).getText();
+            nextButton = availabilityDateUl.findElement(By.className("carousel-control-next"));
 
-            if(date.isEmpty())
-                break;
-
-            dates.add(date);
-
-            vaccineHashMap.put(date, new ArrayList<>());
+            prevButton = availabilityDateUl.findElement(By.className("carousel-control-prev"));
         }
 
 
-
-
-
-
-        WebElement centersBox = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("center-box")))
-                .findElement(By.tagName("div"))
-                .findElement(By.tagName("div"));
-
-        List<WebElement> centersBoxElements = centersBox.findElements(By.tagName("div"));
-
-        if(centersBoxElements.isEmpty())
+        while(stepCount > 0)
         {
-            getLogger().info("No Vaccine IN "+districtName+", "+stateName+"!");
-            return;
+            prevButton.click();
+            stepCount--;
         }
-
 
 
         boolean vaccineFound = false;
 
-        for(WebElement eachCenterElement : centersBoxElements)
+
+        ArrayList<String> dates = new ArrayList<>();
+        HashMap<String, ArrayList<Vaccine>> vaccineHashMap = new HashMap<>();
+
+        boolean dateReached = false;
+
+        while(true)
         {
-            List<WebElement> insideElement = eachCenterElement
-                    .findElements(By.tagName("div"));
 
+            WebElement centersBox = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("center-box")))
+                    .findElement(By.tagName("div"))
+                    .findElement(By.tagName("div"));
 
-            if(insideElement.isEmpty())
-                continue;
+            List<WebElement> centersBoxElements = centersBox.findElements(By.tagName("div"));
 
-            List<WebElement> centerBoxes = insideElement.get(0).findElements(By.tagName("div"));
-
-            if(centerBoxes.isEmpty())
-                continue;
-
-            WebElement centerBox = centerBoxes.get(0);
-
-
-            List<WebElement> centerNameTitles = centerBox.findElements(By.className("center-name-title"));
-
-            if(centerNameTitles.isEmpty())
-                continue;
-
-            String centerName = centerNameTitles.get(0).getText();
-            String centerAddress = centerBox.findElement(By.className("center-name-text")).getText();
-
-
-            List<WebElement> slotAvWrap = insideElement.get(1).findElements(By.className("slot-available-wrap"));
-
-            if(slotAvWrap.isEmpty())
+            if(centersBoxElements.isEmpty())
             {
-                continue;
+                getLogger().info("No Vaccine IN "+districtName+", "+stateName+"!");
+                break;
             }
 
-            List<WebElement> vaccineBoxes = slotAvWrap.get(0).findElements(By.className("vaccine-box"));
 
 
-            for(int i = 0;i< vaccineBoxes.size(); i++)
+            List<WebElement> dateElements = availabilityDateUl
+                    .findElement(By.className("carousel-inner"))
+                    .findElements(By.tagName("slide"));
+
+
+
+            for(WebElement eachDateElement : dateElements)
             {
-                WebElement eachVaccineBox = vaccineBoxes.get(i);
+                String date = eachDateElement.findElement(By.tagName("p")).getText();
 
-                WebElement aElement = eachVaccineBox.findElement(By.tagName("a"));
+                if(date.isEmpty())
+                    break;
 
-                String amountLeft = aElement.getText();
 
-                if(amountLeft.equals("Booked") || amountLeft.equals("NA"))
+                if(!dateReached)
+                {
+                    dates.add(date);
+                    vaccineHashMap.put(date, new ArrayList<>());
+                }
+
+                logger.info("'"+dateLimit+"' '"+date+"' aosudhasuiodhasuidh");
+
+                if(dateLimit.equals(date))
+                {
+                    dateReached = true;
+                }
+
+
+
+            }
+
+
+
+
+
+            for(WebElement eachCenterElement : centersBoxElements)
+            {
+                List<WebElement> insideElement = eachCenterElement
+                        .findElements(By.tagName("div"));
+
+
+                if(insideElement.isEmpty())
                     continue;
 
-                WebElement vaccineNameElement = eachVaccineBox.findElement(By.className("vaccine-cnt"));
+                List<WebElement> centerBoxes = insideElement.get(0).findElements(By.tagName("div"));
 
-                String vaccineName = vaccineNameElement.getText();
+                if(centerBoxes.isEmpty())
+                    continue;
 
-
-                WebElement ageLimitElement = eachVaccineBox.findElement(By.className("age-limit"));
-
-                String ageLimit = ageLimitElement.getText();
+                WebElement centerBox = centerBoxes.get(0);
 
 
-                String date = dates.get(i);
+                List<WebElement> centerNameTitles = centerBox.findElements(By.className("center-name-title"));
 
-                vaccineHashMap.get(date).add(new Vaccine(centerName, centerAddress, amountLeft, vaccineName, ageLimit));
-                vaccineFound = true;
+                if(centerNameTitles.isEmpty())
+                    continue;
+
+                String centerName = centerNameTitles.get(0).getText();
+                String centerAddress = centerBox.findElement(By.className("center-name-text")).getText();
+
+
+                List<WebElement> slotAvWrap = insideElement.get(1).findElements(By.className("slot-available-wrap"));
+
+                if(slotAvWrap.isEmpty())
+                {
+                    continue;
+                }
+
+                List<WebElement> vaccineBoxes = slotAvWrap.get(0).findElements(By.className("vaccine-box"));
+
+
+                for(int i = 0;i< dates.size(); i++)
+                {
+                    WebElement eachVaccineBox = vaccineBoxes.get(i);
+
+                    WebElement aElement = eachVaccineBox.findElement(By.tagName("a"));
+
+                    String amountLeft = aElement.getText();
+
+                    if(amountLeft.equals("Booked") || amountLeft.equals("NA"))
+                        continue;
+
+                    WebElement vaccineNameElement = eachVaccineBox.findElement(By.className("vaccine-cnt"));
+
+                    String vaccineName = vaccineNameElement.getText();
+
+
+                    WebElement ageLimitElement = eachVaccineBox.findElement(By.className("age-limit"));
+
+                    String ageLimit = ageLimitElement.getText();
+
+
+                    String date = dates.get(i);
+
+                    vaccineHashMap.get(date).add(new Vaccine(centerName, centerAddress, amountLeft, vaccineName, ageLimit));
+
+                    vaccineFound=true;
+                }
             }
+
+            if(dateReached)
+                break;
+
+            nextButton.click();
+            stepCount++;
         }
+
 
 
         if(vaccineFound)
@@ -429,5 +485,8 @@ public class WebScrapperTask extends TimerTask
     {
         return logger;
     }
+
+    private WebElement nextButton = null;
+    private WebElement prevButton = null;
 
 }
