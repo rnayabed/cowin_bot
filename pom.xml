@@ -38,7 +38,7 @@
 
         <search.state>West Bengal</search.state>
         <search.districts>South 24 Parganas, Kolkata</search.districts>
-        <search.date.limit>10 May 2021</search.date.limit> <!--Example:6 May 2021-->
+        <search.date.limit></search.date.limit> <!--Example:6 May 2021-->
         <search.filters>AGE_18_PLUS</search.filters>
 
         <timeout.seconds>10</timeout.seconds>
