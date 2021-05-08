@@ -4,6 +4,11 @@ A webscrapper bot written in Java to keep track of real time vaccines from the C
 
 ![version](https://img.shields.io/badge/Version-2.0.0-green)
 
+## Prerequisites
+
+* Java >= 11
+* Maven >= 3.6.3
+
 ## Get Started
 
 ```
