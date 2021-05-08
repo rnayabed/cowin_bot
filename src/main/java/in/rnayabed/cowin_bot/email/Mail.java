@@ -1,5 +1,6 @@
 package in.rnayabed.cowin_bot.email;
 
+import in.rnayabed.cowin_bot.vaccine.SearchType;
 import in.rnayabed.cowin_bot.vaccine.Vaccine;
 
 import javax.mail.Message;
@@ -29,6 +30,9 @@ public class Mail extends TimerTask
     private String stateName, districtName;
 
     private String body;
+    private String pinCode;
+
+    private SearchType searchType;
 
     public Mail(String stateName, String districtName, HashMap<String, ArrayList<Vaccine>> vaccineHashMap)
     {
@@ -36,6 +40,26 @@ public class Mail extends TimerTask
         this.stateName = stateName;
         this.districtName = districtName;
         this.body = getEmailBody(vaccineHashMap);
+
+        this.searchType = SearchType.STATE_DISTRICT;
+
+        logger = Logger.getLogger("in.rnayabed");
+
+        from = System.getProperty("mail.smtp.user");
+        pass = System.getProperty("mail.smtp.user.pass");
+
+        to = System.getProperty("mail.smtp.to");
+
+        host = System.getProperty("mail.smtp.host");
+    }
+
+    public Mail(String pinCode, HashMap<String, ArrayList<Vaccine>> vaccineHashMap)
+    {
+        this.vaccineHashMap = vaccineHashMap;
+        this.pinCode = pinCode;
+        this.body = getEmailBody(vaccineHashMap);
+
+        this.searchType = SearchType.PIN;
 
         logger = Logger.getLogger("in.rnayabed");
 
@@ -49,7 +73,7 @@ public class Mail extends TimerTask
 
     public String getEmailBody(HashMap<String, ArrayList<Vaccine>> vaccineHashMap)
     {
-        StringBuilder stringBuilder = new StringBuilder("Vaccines are available!\n\n\n");
+        StringBuilder stringBuilder = new StringBuilder();
 
 
         for(String date : vaccineHashMap.keySet())
@@ -130,9 +154,10 @@ public class Mail extends TimerTask
             message.addRecipients(Message.RecipientType.TO,
                     internetAddresses);
 
-
-            message.setSubject("VACCINES AVAILABLE IN "+districtName+", "+stateName);
-
+            if(searchType == SearchType.STATE_DISTRICT)
+                message.setSubject("VACCINES AVAILABLE IN "+districtName+", "+stateName);
+            else
+                message.setSubject("VACCINES AVAILABLE IN "+pinCode);
 
             message.setText(getEmailBody(vaccineHashMap));
 

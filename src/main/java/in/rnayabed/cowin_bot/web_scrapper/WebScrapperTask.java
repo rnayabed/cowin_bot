@@ -2,7 +2,8 @@ package in.rnayabed.cowin_bot.web_scrapper;
 
 import in.rnayabed.cowin_bot.email.Mail;
 import in.rnayabed.cowin_bot.exception.BotException;
-import in.rnayabed.cowin_bot.vaccine.Filter;
+import in.rnayabed.cowin_bot.vaccine.SearchFilter;
+import in.rnayabed.cowin_bot.vaccine.SearchType;
 import in.rnayabed.cowin_bot.vaccine.Vaccine;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -23,18 +24,23 @@ public class WebScrapperTask extends TimerTask
     private String url;
     private String state;
     private String[] districts;
+    private String[] pins;
     private String dateLimit;
 
     private WebDriver webDriver;
     private WebDriverWait webDriverWait;
 
-    private Filter[] filters = null;
+    private SearchType searchType;
+
+    private SearchFilter[] searchFilters = null;
 
     public WebScrapperTask()
     {
         logger = Logger.getLogger("in.rnayabed");
 
         dateLimit = System.getProperty("search.date.limit").strip();
+
+        searchType = SearchType.valueOf(System.getProperty("search.type").strip());
 
         districtHashMap= new HashMap<>();
 
@@ -49,15 +55,23 @@ public class WebScrapperTask extends TimerTask
         }
 
 
+        pins = System.getProperty("search.pins").split(",");
+
+        for(int j = 0;j<pins.length;j++)
+        {
+            pins[j] = pins[j].strip();
+        }
+
+
 
         if(!System.getProperty("search.filters").isBlank())
         {
             String[] tmpFilters = System.getProperty("search.filters").split(",");
 
-            filters = new Filter[tmpFilters.length];
+            searchFilters = new SearchFilter[tmpFilters.length];
             for(int j = 0;j<tmpFilters.length;j++)
             {
-                filters[j] = Filter.valueOf(tmpFilters[j].strip());
+                searchFilters[j] = SearchFilter.valueOf(tmpFilters[j].strip());
             }
         }
 
@@ -111,11 +125,22 @@ public class WebScrapperTask extends TimerTask
         try
         {
             loadCowinWebsite();
-            selectSearchByDistrict();
+            selectSearchByDistrictOrPin();
 
-            if(districts.length == 1)
+
+            if(searchType == SearchType.STATE_DISTRICT)
             {
-                chooseStateDistrictAndType(state, districts[0]);
+                if(districts.length == 1)
+                {
+                    chooseStateDistrictAndType(state, districts[0]);
+                }
+            }
+            else if(searchType == SearchType.PIN)
+            {
+                if(pins.length == 1)
+                {
+                    choosePin(pins[0]);
+                }
             }
         }
         catch (Exception e)
@@ -132,15 +157,26 @@ public class WebScrapperTask extends TimerTask
         getLogger().log(Level.INFO, "... Done!");
     }
 
-    private void selectSearchByDistrict()
+    private void selectSearchByDistrictOrPin()
     {
-        getLogger().log(Level.INFO, "Selecting search by district ...");
 
         WebElement statusSwitchElementDiv = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("status-switch")));
 
         if(webDriver.findElements(By.className("mat-select-48")).size() == 0)
         {
-            statusSwitchElementDiv.click();
+            if(searchType == SearchType.STATE_DISTRICT)
+            {
+                getLogger().log(Level.INFO, "Selecting search by district ...");
+                statusSwitchElementDiv.click();
+            }
+        }
+        else
+        {
+            if(searchType == SearchType.PIN)
+            {
+                getLogger().log(Level.INFO, "Selecting search by PIN ...");
+                statusSwitchElementDiv.click();
+            }
         }
     }
 
@@ -154,11 +190,20 @@ public class WebScrapperTask extends TimerTask
         }
     }
 
+    private void choosePinAndTypeAndFinallySearchAndGetAvailableVaccines(String[] pins) throws BotException
+    {
+        for(String pin: pins)
+        {
+            choosePin(pin);
+            search();
+            getAvailableVaccines(pin);
+        }
+    }
+
     private HashMap<String, Integer> districtHashMap;
 
     private void chooseStateDistrictAndType(String stateName, String districtName) throws BotException
     {
-
         if(stateSelectorBox == null)
         {
             WebElement searchdistwrperDiv = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("searchdistwrper")));
@@ -201,6 +246,22 @@ public class WebScrapperTask extends TimerTask
         districtHashMap.put(districtName, districtFound);
     }
 
+
+    private WebElement pinSelectorBox = null;
+
+    private void choosePin(String pinCode)
+    {
+        if(pinSelectorBox == null)
+        {
+            pinSelectorBox = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("pin-search")))
+                    .findElement(By.tagName("input"));
+        }
+
+
+        pinSelectorBox.clear();
+        pinSelectorBox.sendKeys(pinCode);
+    }
+
     private WebElement stateSelectorBox = null;
     private WebElement districtSelectorBox = null;
 
@@ -211,12 +272,19 @@ public class WebScrapperTask extends TimerTask
     private WebElement freeFilterWebElement = null;
     private WebElement paidFilterWebElement = null;
 
+
+    private WebElement searchButton = null;
+
     private void search()
     {
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("searchdistwrper")))
-                .findElement(By.className("pinbtncover"))
-                .findElement(By.tagName("button"))
-                .click();
+        if(searchButton == null)
+        {
+            searchButton = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("pinbtncover")))
+                    .findElement(By.tagName("button"));
+        }
+
+
+        searchButton.click();
 
 
 
@@ -236,21 +304,21 @@ public class WebScrapperTask extends TimerTask
         }
 
 
-        if(filters != null)
+        if(searchFilters != null)
         {
-            for(Filter filter : filters)
+            for(SearchFilter searchFilter : searchFilters)
             {
-                if(filter == Filter.AGE_18_PLUS)
+                if(searchFilter == SearchFilter.AGE_18_PLUS)
                     age18PlusFilterWebElement.click();
-                else if(filter == Filter.AGE_45_PLUS)
+                else if(searchFilter == SearchFilter.AGE_45_PLUS)
                     age45PlusFilterWebElement.click();
-                else if (filter == Filter.COVISHIELD)
+                else if (searchFilter == SearchFilter.COVISHIELD)
                     covishieldFilterWebElement.click();
-                else if(filter == Filter.COVAXIN)
+                else if(searchFilter == SearchFilter.COVAXIN)
                     covaxinFilterWebElement.click();
-                else if(filter == Filter.FREE)
+                else if(searchFilter == SearchFilter.FREE)
                     freeFilterWebElement.click();
-                else if(filter == Filter.PAID)
+                else if(searchFilter == SearchFilter.PAID)
                     paidFilterWebElement.click();
             }
         }
@@ -293,15 +361,23 @@ public class WebScrapperTask extends TimerTask
     {
         try
         {
-            if(districts.length > 1)
+            if(districts.length > 1 || pins.length > 1)
             {
-                chooseStateDistrictAndTypeAndFinallySearchAndGetAvailableVaccines(state, districts);
+                if(searchType == SearchType.STATE_DISTRICT)
+                    chooseStateDistrictAndTypeAndFinallySearchAndGetAvailableVaccines(state, districts);
+                else if(searchType == SearchType.PIN)
+                    choosePinAndTypeAndFinallySearchAndGetAvailableVaccines(pins);
             }
             else
             {
                 search();
-                getAvailableVaccines(state, districts[0]);
+
+                if(searchType == SearchType.STATE_DISTRICT)
+                    getAvailableVaccines(state, districts[0]);
+                else
+                    getAvailableVaccines(pins[0]);
             }
+
         }
         catch (Exception e)
         {
@@ -312,7 +388,18 @@ public class WebScrapperTask extends TimerTask
 
     int stepCount = 0;
 
+    private void getAvailableVaccines(String pinCode)
+    {
+        getAvailableVaccines(pinCode, null, null);
+    }
+
     private void getAvailableVaccines(String stateName, String districtName)
+    {
+        getAvailableVaccines(null, stateName, districtName);
+    }
+
+
+    private void getAvailableVaccines(String pinCode, String stateName, String districtName)
     {
         WebElement availabilityDateUl = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("availability-date-ul")));
 
@@ -466,12 +553,27 @@ public class WebScrapperTask extends TimerTask
 
         if(vaccineFound)
         {
-            getLogger().info("VACCINE AVAILABLE IN "+districtName+", "+stateName+" ...");
-            new Timer().schedule(new Mail(stateName, districtName, vaccineHashMap), 0);
+            if(searchType == SearchType.STATE_DISTRICT)
+            {
+                getLogger().info("VACCINE AVAILABLE IN "+districtName+", "+stateName+" ...");
+                new Timer().schedule(new Mail(stateName, districtName, vaccineHashMap), 0);
+            }
+            else if(searchType == SearchType.PIN)
+            {
+                getLogger().info("VACCINE AVAILABLE IN "+pinCode+" ...");
+                new Timer().schedule(new Mail(pinCode, vaccineHashMap), 0);
+            }
         }
         else
         {
-            getLogger().info("No Vaccine IN "+districtName+", "+stateName+"!");
+            if(searchType == SearchType.STATE_DISTRICT)
+            {
+                getLogger().info("No Vaccine IN "+districtName+", "+stateName+" ...");
+            }
+            else if(searchType == SearchType.PIN)
+            {
+                getLogger().info("No Vaccine IN "+pinCode+" ...");
+            }
         }
 
         getLogger().info("Repeating after "+System.getProperty("repeat.millis")+" millis ...");

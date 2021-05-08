@@ -12,7 +12,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
 
-        <bot.version>1.7.1</bot.version>
+        <bot.version>2.0.0</bot.version>
         <bot.repo>https://github.com/rnayabed/cowin_bot</bot.repo>
 
 
@@ -29,6 +29,10 @@
 
 
         <cowin.website.url>https://www.cowin.gov.in/</cowin.website.url>
+
+        <search.type>PIN</search.type>
+
+        <search.pins>788806</search.pins>
 
         <search.state>West Bengal</search.state>
         <search.districts>South 24 Parganas, Kolkata</search.districts>
@@ -203,6 +207,14 @@
                         <systemProperty>
                             <key>search.date.limit</key>
                             <value>${search.date.limit}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>search.type</key>
+                            <value>${search.type}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>search.pins</key>
+                            <value>${search.pins}</value>
                         </systemProperty>
                     </systemProperties>
                 </configuration>
