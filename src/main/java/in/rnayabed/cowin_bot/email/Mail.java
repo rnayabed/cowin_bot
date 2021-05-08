@@ -156,7 +156,7 @@ public class Mail extends TimerTask
 
             if(searchType == SearchType.STATE_DISTRICT)
                 message.setSubject("VACCINES AVAILABLE IN "+districtName+", "+stateName);
-            else
+            else if(searchType == SearchType.PIN)
                 message.setSubject("VACCINES AVAILABLE IN "+pinCode);
 
             message.setText(getEmailBody(vaccineHashMap));
