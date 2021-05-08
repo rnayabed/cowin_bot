@@ -6,13 +6,13 @@
 
     <groupId>in.rnayabed</groupId>
     <artifactId>cowin_bot</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
 
-        <bot.version>2.0.0</bot.version>
+        <bot.version>2.1.0</bot.version>
         <bot.repo>https://github.com/rnayabed/cowin_bot</bot.repo>
 
 
@@ -26,6 +26,8 @@
         <browser.run.headless>false</browser.run.headless>
 
         <browser.choice>firefox</browser.choice>
+
+        <instant.mail>true</instant.mail>
 
 
         <cowin.website.url>https://www.cowin.gov.in/</cowin.website.url>
@@ -215,6 +217,10 @@
                         <systemProperty>
                             <key>search.pins</key>
                             <value>${search.pins}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>instant.mail</key>
+                            <value>${instant.mail}</value>
                         </systemProperty>
                     </systemProperties>
                 </configuration>

@@ -32,11 +32,15 @@ public class WebScrapperTask extends TimerTask
 
     private SearchType searchType;
 
+    private boolean instantMail;
+
     private SearchFilter[] searchFilters = null;
 
     public WebScrapperTask()
     {
         logger = Logger.getLogger("in.rnayabed");
+
+        instantMail = System.getProperty("instant.mail").equals("true");
 
         dateLimit = System.getProperty("search.date.limit").strip();
 
@@ -535,7 +539,25 @@ public class WebScrapperTask extends TimerTask
 
                     String date = dates.get(i);
 
-                    vaccineHashMap.get(date).add(new Vaccine(centerName, centerAddress, amountLeft, vaccineName, ageLimit));
+                    Vaccine vaccine = new Vaccine(centerName, centerAddress, amountLeft, vaccineName, ageLimit);
+
+                    vaccineHashMap.get(date).add(vaccine);
+
+                    if(instantMail)
+                    {
+                        instantMail = false;
+
+                        if(searchType == SearchType.STATE_DISTRICT)
+                        {
+                            getLogger().info("INSTANT VACCINE AVAILABLE IN "+districtName+", "+stateName+" ...");
+                            new Timer().schedule(new Mail(stateName, districtName, date, vaccine), 0);
+                        }
+                        else if(searchType == SearchType.PIN)
+                        {
+                            getLogger().info("INSTANT VACCINE AVAILABLE IN "+pinCode+" ...");
+                            new Timer().schedule(new Mail(pinCode, date, vaccine), 0);
+                        }
+                    }
 
                     vaccineFound=true;
                 }

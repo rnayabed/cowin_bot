@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 
 public class Mail extends TimerTask
 {
-    private HashMap<String, ArrayList<Vaccine>> vaccineHashMap;
 
     private String from;
     private String pass;
@@ -36,31 +35,53 @@ public class Mail extends TimerTask
 
     public Mail(String stateName, String districtName, HashMap<String, ArrayList<Vaccine>> vaccineHashMap)
     {
-        this.vaccineHashMap = vaccineHashMap;
+        this();
+
         this.stateName = stateName;
         this.districtName = districtName;
+
         this.body = getEmailBody(vaccineHashMap);
 
         this.searchType = SearchType.STATE_DISTRICT;
-
-        logger = Logger.getLogger("in.rnayabed");
-
-        from = System.getProperty("mail.smtp.user");
-        pass = System.getProperty("mail.smtp.user.pass");
-
-        to = System.getProperty("mail.smtp.to");
-
-        host = System.getProperty("mail.smtp.host");
     }
 
     public Mail(String pinCode, HashMap<String, ArrayList<Vaccine>> vaccineHashMap)
     {
-        this.vaccineHashMap = vaccineHashMap;
+        this();
+
         this.pinCode = pinCode;
+
         this.body = getEmailBody(vaccineHashMap);
 
         this.searchType = SearchType.PIN;
+    }
 
+    public Mail(String stateName, String districtName, String date, Vaccine vaccine)
+    {
+        this();
+
+        this.stateName = stateName;
+        this.districtName = districtName;
+
+        this.body = getEmailBody(date, vaccine);
+
+        this.searchType = SearchType.STATE_DISTRICT;
+    }
+
+    public Mail(String pinCode, String date, Vaccine vaccine)
+    {
+        this();
+
+        this.pinCode = pinCode;
+
+        this.body = getEmailBody(date, vaccine);
+
+        this.searchType = SearchType.STATE_DISTRICT;
+    }
+
+
+    private Mail()
+    {
         logger = Logger.getLogger("in.rnayabed");
 
         from = System.getProperty("mail.smtp.user");
@@ -70,6 +91,9 @@ public class Mail extends TimerTask
 
         host = System.getProperty("mail.smtp.host");
     }
+
+
+
 
     public String getEmailBody(HashMap<String, ArrayList<Vaccine>> vaccineHashMap)
     {
@@ -96,11 +120,34 @@ public class Mail extends TimerTask
                         .append("Center Address: ").append(vaccine.getCenterAddress()).append("\n")
                         .append("Vaccine Name: ").append(vaccine.getVaccineName()).append("\n")
                         .append("Amount Left: ").append(vaccine.getAmountLeft()).append("\n")
-                        .append("Limit: ").append(vaccine.getAgeLimit()).append("\n\n");
+                        .append("Limit: ").append(vaccine.getAgeLimit());
             }
 
             stringBuilder.append("\n\n\n");
         }
+
+        stringBuilder.append(getBodyFooter());
+
+
+
+        return stringBuilder.toString();
+    }
+
+    public String getEmailBody(String date, Vaccine vaccine)
+    {
+        return "Instant Vaccine notifier. Larger mail with all available vaccines coming soon." +
+                "\nDate : " + date +
+                "\nCenter Name: " + vaccine.getCenterName() +
+                "\nCenter Address: " + vaccine.getCenterAddress() +
+                "\nVaccine Name: " + vaccine.getVaccineName() +
+                "\nAmount Left: " + vaccine.getAmountLeft() +
+                "\nLimit: " + vaccine.getAgeLimit() +
+                getBodyFooter();
+    }
+
+    public String getBodyFooter()
+    {
+        StringBuilder stringBuilder= new StringBuilder();
 
         stringBuilder.append("\n\ncowin_bot by rnayabed (Debayan Sutradhar)")
                 .append("\nVersion: ").append(System.getProperty("bot.version"))
@@ -115,8 +162,6 @@ public class Mail extends TimerTask
             getLogger().log(Level.SEVERE, e.getMessage(), e);
             getLogger().info("Failed to get system name !");
         }
-
-
 
         return stringBuilder.toString();
     }
@@ -155,11 +200,11 @@ public class Mail extends TimerTask
                     internetAddresses);
 
             if(searchType == SearchType.STATE_DISTRICT)
-                message.setSubject("VACCINES AVAILABLE IN "+districtName+", "+stateName);
+                message.setSubject("VACCINE AVAILABLE IN "+districtName+", "+stateName);
             else if(searchType == SearchType.PIN)
-                message.setSubject("VACCINES AVAILABLE IN "+pinCode);
+                message.setSubject("VACCINE AVAILABLE IN "+pinCode);
 
-            message.setText(getEmailBody(vaccineHashMap));
+            message.setText(body);
 
 
             Transport transport = session.getTransport("smtp");
