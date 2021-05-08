@@ -438,7 +438,6 @@ public class WebScrapperTask extends TimerTask
 
             if(centersBoxElements.isEmpty())
             {
-                getLogger().info("No Vaccine IN "+districtName+", "+stateName+"!");
                 break;
             }
 
