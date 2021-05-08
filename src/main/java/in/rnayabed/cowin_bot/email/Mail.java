@@ -8,6 +8,8 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
@@ -76,9 +78,21 @@ public class Mail extends TimerTask
             stringBuilder.append("\n\n\n");
         }
 
-        stringBuilder.append("\n\ncowin_bot by rnayabed (Debayan Sutradhar)\n")
-                .append("Version: ").append(System.getProperty("bot.version"))
+        stringBuilder.append("\n\ncowin_bot by rnayabed (Debayan Sutradhar)")
+                .append("\nVersion: ").append(System.getProperty("bot.version"))
                 .append("\nSource: ").append(System.getProperty("bot.repo"));
+
+        try
+        {
+            stringBuilder.append("\nHostname : ").append(InetAddress.getLocalHost().getHostName());
+        }
+        catch (Exception e)
+        {
+            getLogger().log(Level.SEVERE, e.getMessage(), e);
+            getLogger().info("Failed to get system name !");
+        }
+
+
 
         return stringBuilder.toString();
     }
