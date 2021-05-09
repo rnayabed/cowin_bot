@@ -6,13 +6,13 @@
 
     <groupId>in.rnayabed</groupId>
     <artifactId>cowin_bot</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.1</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
 
-        <bot.version>2.1.0</bot.version>
+        <bot.version>2.1.1</bot.version>
         <bot.repo>https://github.com/rnayabed/cowin_bot</bot.repo>
 
 
@@ -20,10 +20,10 @@
 
         <main.class.name>in.rnayabed.cowin_bot.Main</main.class.name>
 
-        <gecko.driver.path>/home/rnayabed/Downloads/geckodriver</gecko.driver.path>
+        <gecko.driver.path>/home/rnayabed/HDD_1/code/tools/geckodriver</gecko.driver.path>
         <chrome.driver.path>/usr/bin/chromedriver</chrome.driver.path>
 
-        <browser.run.headless>false</browser.run.headless>
+        <browser.run.headless>true</browser.run.headless>
 
         <browser.choice>firefox</browser.choice>
 
@@ -39,7 +39,7 @@
         <search.state>West Bengal</search.state>
         <search.districts>South 24 Parganas, Kolkata</search.districts>
         <search.date.limit></search.date.limit> <!--Example:6 May 2021-->
-        <search.filters>AGE_18_PLUS</search.filters>
+        <search.filters></search.filters>
 
         <timeout.seconds>10</timeout.seconds>
         <repeat.millis>30000</repeat.millis>

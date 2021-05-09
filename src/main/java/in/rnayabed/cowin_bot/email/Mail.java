@@ -76,7 +76,7 @@ public class Mail extends TimerTask
 
         this.body = getEmailBody(date, vaccine);
 
-        this.searchType = SearchType.STATE_DISTRICT;
+        this.searchType = SearchType.PIN;
     }
 
 

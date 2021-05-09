@@ -406,6 +406,7 @@ public class WebScrapperTask extends TimerTask
     }
 
 
+
     private void getAvailableVaccines(String pinCode, String stateName, String districtName)
     {
         WebElement availabilityDateUl = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("availability-date-ul")));
@@ -419,8 +420,10 @@ public class WebScrapperTask extends TimerTask
         }
 
 
+
         while(stepCount > 0)
         {
+
             prevButton.click();
             stepCount--;
         }
@@ -434,6 +437,7 @@ public class WebScrapperTask extends TimerTask
 
         boolean dateReached = false;
 
+
         while(true)
         {
 
@@ -445,6 +449,7 @@ public class WebScrapperTask extends TimerTask
 
             if(centersBoxElements.isEmpty())
             {
+
                 break;
             }
 
@@ -458,11 +463,11 @@ public class WebScrapperTask extends TimerTask
 
             for(WebElement eachDateElement : dateElements)
             {
+
                 String date = eachDateElement.findElement(By.tagName("p")).getText();
 
                 if(date.isEmpty())
                     break;
-
 
                 if(!dateReached)
                 {
@@ -476,15 +481,15 @@ public class WebScrapperTask extends TimerTask
                 }
 
 
-
             }
-
 
 
 
 
             for(WebElement eachCenterElement : centersBoxElements)
             {
+
+
                 List<WebElement> insideElement = eachCenterElement
                         .findElements(By.tagName("div"));
 
@@ -492,10 +497,14 @@ public class WebScrapperTask extends TimerTask
                 if(insideElement.isEmpty())
                     continue;
 
+
+
                 List<WebElement> centerBoxes = insideElement.get(0).findElements(By.tagName("div"));
 
                 if(centerBoxes.isEmpty())
                     continue;
+
+
 
                 WebElement centerBox = centerBoxes.get(0);
 
@@ -505,9 +514,10 @@ public class WebScrapperTask extends TimerTask
                 if(centerNameTitles.isEmpty())
                     continue;
 
-                String centerName = centerNameTitles.get(0).getText();
-                String centerAddress = centerBox.findElement(By.className("center-name-text")).getText();
 
+                String centerName = centerNameTitles.get(0).getText();
+
+                String centerAddress = centerBox.findElement(By.className("center-name-text")).getText();
 
                 List<WebElement> slotAvWrap = insideElement.get(1).findElements(By.className("slot-available-wrap"));
 
