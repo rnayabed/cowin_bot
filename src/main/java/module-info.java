@@ -1,14 +1,15 @@
 module in.rnayabed.cowin_bot
 {
     requires java.logging;
-    requires selenium.java;
-    requires selenium.server;
-    requires selenium.firefox.driver;
-    requires selenium.chrome.driver;
-    requires selenium.api;
-    requires selenium.support;
 
+    requires org.seleniumhq.selenium.java;
+    requires org.seleniumhq.selenium.firefox_driver;
+    requires org.seleniumhq.selenium.chrome_driver;
+    requires org.seleniumhq.selenium.edge_driver;
+    requires org.seleniumhq.selenium.api;
+    requires org.seleniumhq.selenium.chromium_driver;
 
+    requires org.seleniumhq.selenium.support;
 
     requires javax.mail.api;
 

@@ -10,11 +10,14 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,6 +39,29 @@ public class WebScrapperTask extends TimerTask
 
     private SearchFilter[] searchFilters = null;
 
+    private boolean isLoggedIn = false;
+
+    private String thisTabHandle;
+
+    public String getThisTabHandle()
+    {
+        return thisTabHandle;
+    }
+
+    private GoogleMessagesTask googleMessagesTask;
+
+    private String otp = null;
+
+    private String authWebsite;
+    private String phoneNumber;
+    private int googleMessagesAuthTimeoutInSeconds;
+    private String convoWebsite;
+
+    private String[] senders;
+    private int otpIndex;
+
+    private int otpValidityMin;
+
     public WebScrapperTask()
     {
         logger = Logger.getLogger("in.rnayabed");
@@ -43,6 +69,11 @@ public class WebScrapperTask extends TimerTask
         instantMail = System.getProperty("instant.mail").equals("true");
 
         dateLimit = System.getProperty("search.date.limit").strip();
+
+        this.authWebsite = System.getProperty("google.messages.auth.website.url");
+        this.convoWebsite = System.getProperty("google.messages.convo.website.url");
+        this.phoneNumber = System.getProperty("otp.phone.number");
+        this.googleMessagesAuthTimeoutInSeconds = Integer.parseInt(System.getProperty("google.messages.auth.timeout.seconds"));
 
         searchType = SearchType.valueOf(System.getProperty("search.type").strip());
 
@@ -66,7 +97,16 @@ public class WebScrapperTask extends TimerTask
             pins[j] = pins[j].strip();
         }
 
+        this.senders = System.getProperty("otp.senders").split(",");
 
+        for(int i =0;i<senders.length;i++)
+        {
+            senders[i] = senders[i].strip();
+        }
+
+        this.otpIndex = Integer.parseInt(System.getProperty("otp.message.space.index"));
+
+        this.otpValidityMin = Integer.parseInt(System.getProperty("otp.validity.min"));
 
         if(!System.getProperty("search.filters").isBlank())
         {
@@ -80,13 +120,13 @@ public class WebScrapperTask extends TimerTask
         }
 
 
-        String browserChoice = System.getProperty("browser.choice").toLowerCase();
+        BrowserType browserType = BrowserType.valueOf(System.getProperty("browser.choice"));
         boolean runHeadless = System.getProperty("browser.run.headless").equalsIgnoreCase("true");
 
         String windowHeight = System.getProperty("browser.window.height").strip();
         String windowWidth = System.getProperty("browser.window.width").strip();
 
-        if(browserChoice.equals("chrome") || browserChoice.equals("chromium"))
+        if(browserType == BrowserType.CHROME || browserType == BrowserType.CHROMIUM)
         {
             getLogger().log(Level.INFO, "Setting up chrome driver ...");
 
@@ -94,15 +134,30 @@ public class WebScrapperTask extends TimerTask
 
             if(runHeadless)
             {
-                chromeOptions.addArguments("--headless");
-                chromeOptions.addArguments("--start-maximized");
+                chromeOptions.addArguments("--headless","--start-maximized");
             }
 
-            chromeOptions.addArguments("--window-size="+windowWidth+","+windowHeight);
+            chromeOptions.addArguments("--window-size="+windowWidth+","+windowHeight, "user-data-dir=D:/webdriver/chrome-user-dir");
 
             webDriver = new ChromeDriver(chromeOptions);
         }
-        else if (browserChoice.equals("firefox") || browserChoice.equals("gecko"))
+        else if(browserType == BrowserType.EDGE)
+        {
+            getLogger().log(Level.INFO, "Setting up edge driver ...");
+
+            EdgeOptions edgeOptions = new EdgeOptions();
+
+            if(runHeadless)
+            {
+                edgeOptions.addArguments("--headless");
+                edgeOptions.addArguments("--start-maximized");
+            }
+
+            edgeOptions.addArguments("--window-size="+windowWidth+","+windowHeight, "user-data-dir=D:/webdriver/chrome-user-dir");
+
+            webDriver = new EdgeDriver(edgeOptions);
+        }
+        else if (browserType == BrowserType.FIREFOX || browserType == BrowserType.GECKO)
         {
             getLogger().log(Level.INFO, "Setting up firefox driver ...");
 
@@ -118,17 +173,54 @@ public class WebScrapperTask extends TimerTask
         }
         else
         {
-            throw new IllegalArgumentException("browser.choice property is invalid ("+browserChoice+")");
+            throw new IllegalArgumentException("browser.choice is invalid !");
         }
 
 
-        webDriverWait = new WebDriverWait(webDriver, Long.parseLong(System.getProperty("timeout.seconds")));
+        webDriverWait = new WebDriverWait(webDriver, Duration.ofSeconds(Long.parseLong(System.getProperty("timeout.seconds"))));
         getLogger().log(Level.INFO, "... Done!");
 
 
         try
         {
+
+            thisTabHandle = webDriver.getWindowHandle();
+
+            googleMessagesTask = new GoogleMessagesTask(webDriver, phoneNumber, googleMessagesAuthTimeoutInSeconds,
+                    authWebsite, convoWebsite, senders, otpIndex, otpValidityMin);
+
+            googleMessagesTask.load();
+
             loadCowinWebsite();
+            sendOTP();
+
+            otp = googleMessagesTask.getOTP();
+
+
+            if(otp != null)
+            {
+                isLoggedIn = true;
+
+                getLogger().info("Successfully obtained OTP : "+otp);
+            }
+            else
+            {
+                webDriver.close();
+                return;
+            }
+
+
+            sleep(3000);
+
+            webDriver.switchTo().window(getThisTabHandle());
+            WebElement otpInputBox = webDriver.findElement(By.tagName("input"));
+
+            otpInputBox.sendKeys(otp);
+
+            WebElement button = webDriver.findElement(By.tagName("ion-button"));
+            button.click();
+
+
             selectSearchByDistrictOrPin();
 
 
@@ -156,9 +248,56 @@ public class WebScrapperTask extends TimerTask
 
     private void loadCowinWebsite()
     {
+        webDriver.switchTo().window(getThisTabHandle());
+
         getLogger().log(Level.INFO, "Loading cowin website ("+url+") ...");
         webDriver.get(url);
         getLogger().log(Level.INFO, "... Done!");
+    }
+
+    private void sendOTP()
+    {
+//        WebElement formElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("login-block")))
+//                .findElement(By.tagName("ion-row"))
+//                .findElements(By.tagName("ion-col")).get(1);
+//
+//        WebElement inputElement = formElement.findElement(By.tagName("ion-item"))
+//                .findElement(By.tagName("mat-form-field"))
+//                .findElement(By.tagName("div"))
+//                .findElement(By.tagName("div"))
+//                .findElement(By.tagName("div"))
+//                .findElement(By.tagName("input"));
+//
+//
+//        inputElement.sendKeys(phoneNumber);
+//
+//        try {
+//            Thread.sleep(2000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        WebElement buttonElement = formElement.findElement(By.className("covid-button-desktop"))
+//                .findElement(By.tagName("ion-button"));
+//
+//        buttonElement.click();
+//
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
+        sleep(3000);
+
+        webDriver.switchTo().window(getThisTabHandle());
+        WebElement otpInputBox = webDriver.findElement(By.tagName("input"));
+
+        otpInputBox.sendKeys(phoneNumber);
+
+        WebElement button = webDriver.findElement(By.tagName("ion-button"));
+        button.click();
+
     }
 
     private void selectSearchByDistrictOrPin()
@@ -365,26 +504,26 @@ public class WebScrapperTask extends TimerTask
     {
         try
         {
-            if(districts.length > 1 || pins.length > 1)
-            {
-                if(searchType == SearchType.STATE_DISTRICT)
-                    chooseStateDistrictAndTypeAndFinallySearchAndGetAvailableVaccines(state, districts);
-                else if(searchType == SearchType.PIN)
-                    choosePinAndTypeAndFinallySearchAndGetAvailableVaccines(pins);
-            }
-            else
-            {
-                search();
+//            if(districts.length > 1 || pins.length > 1)
+//            {
+//                if(searchType == SearchType.STATE_DISTRICT)
+//                    chooseStateDistrictAndTypeAndFinallySearchAndGetAvailableVaccines(state, districts);
+//                else if(searchType == SearchType.PIN)
+//                    choosePinAndTypeAndFinallySearchAndGetAvailableVaccines(pins);
+//            }
+//            else
+//            {
+//                search();
+//
+//                if(searchType == SearchType.STATE_DISTRICT)
+//                    getAvailableVaccines(state, districts[0]);
+//                else
+//                    getAvailableVaccines(pins[0]);
+//            }
 
-                if(searchType == SearchType.STATE_DISTRICT)
-                    getAvailableVaccines(state, districts[0]);
-                else
-                    getAvailableVaccines(pins[0]);
-            }
 
 
-
-            getLogger().info("Repeating after "+System.getProperty("repeat.millis")+" millis ...");
+//            getLogger().info("Repeating after "+System.getProperty("repeat.millis")+" millis ...");
         }
         catch (Exception e)
         {
@@ -620,4 +759,16 @@ public class WebScrapperTask extends TimerTask
     private WebElement nextButton = null;
     private WebElement prevButton = null;
 
+
+    private void sleep(long millis)
+    {
+        try
+        {
+            Thread.sleep(millis);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 }

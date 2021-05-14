@@ -6,31 +6,35 @@
 
     <groupId>in.rnayabed</groupId>
     <artifactId>cowin_bot</artifactId>
-    <version>2.1.1</version>
+    <version>3.0.0-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
 
-        <bot.version>2.1.1</bot.version>
+        <bot.version>3.0.0-SNAPSHOT</bot.version>
         <bot.repo>https://github.com/rnayabed/cowin_bot</bot.repo>
 
 
-        <selenium.version>3.9.1</selenium.version>
+        <selenium.version>4.0.0-beta-3</selenium.version>
+        <selenium.server.version>4.0.0-alpha-2</selenium.server.version>
 
         <main.class.name>in.rnayabed.cowin_bot.Main</main.class.name>
 
-        <gecko.driver.path>/home/rnayabed/HDD_1/code/tools/geckodriver</gecko.driver.path>
+        <gecko.driver.path>D:/tools/geckodriver.exe</gecko.driver.path>
         <chrome.driver.path>/usr/bin/chromedriver</chrome.driver.path>
+        <edge.driver.path>D:/tools/msedgedriver.exe</edge.driver.path>
 
-        <browser.run.headless>true</browser.run.headless>
+        <browser.run.headless>false</browser.run.headless>
 
-        <browser.choice>firefox</browser.choice>
+        <browser.choice>EDGE</browser.choice>
 
         <instant.mail>true</instant.mail>
 
 
-        <cowin.website.url>https://www.cowin.gov.in/</cowin.website.url>
+        <cowin.website.url>https://selfregistration.cowin.gov.in/</cowin.website.url>
+        <google.messages.auth.website.url>https://messages.google.com/web/authentication</google.messages.auth.website.url>
+        <google.messages.convo.website.url>https://messages.google.com/web/authentication</google.messages.convo.website.url>
 
         <search.type>PIN</search.type>
 
@@ -40,6 +44,12 @@
         <search.districts>South 24 Parganas, Kolkata</search.districts>
         <search.date.limit></search.date.limit> <!--Example:6 May 2021-->
         <search.filters></search.filters>
+
+        <google.messages.auth.timeout.seconds>200</google.messages.auth.timeout.seconds>
+        <otp.phone.number>9903299105</otp.phone.number>
+        <otp.senders>AX-NHPSMS</otp.senders>
+        <otp.validity.min>3</otp.validity.min>
+        <otp.message.space.index>6</otp.message.space.index>
 
         <timeout.seconds>10</timeout.seconds>
         <repeat.millis>30000</repeat.millis>
@@ -52,8 +62,8 @@
         <mail.smtp.host>smtp.gmail.com</mail.smtp.host>
         <mail.smtp.port>587</mail.smtp.port>
 
-        <browser.window.width>1920</browser.window.width>
-        <browser.window.height>1080</browser.window.height>
+        <browser.window.width>800</browser.window.width>
+        <browser.window.height>600</browser.window.height>
 
         <mail.smtp.starttls.enable>true</mail.smtp.starttls.enable>
         <mail.smtp.auth>true</mail.smtp.auth>
@@ -64,6 +74,12 @@
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
             <version>${selenium.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-server</artifactId>
+            <version>${selenium.server.version}</version>
         </dependency>
 
         <dependency>
@@ -78,11 +94,11 @@
             <version>${javax.mail.version}</version>
         </dependency>
 
-
+        <!-- https://mvnrepository.com/artifact/com.google.auto.service/auto-service -->
         <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-server</artifactId>
-            <version>${selenium.version}</version>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
@@ -96,6 +112,12 @@
             <artifactId>selenium-chrome-driver</artifactId>
             <version>${selenium.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-edge-driver</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -104,6 +126,14 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                    <release>11</release>
+                    <compilerArgs>
+                        <arg>-proc:none</arg>
+                    </compilerArgs>
+                </configuration>
             </plugin>
 
             <plugin>
@@ -127,8 +157,16 @@
                             <value>${gecko.driver.path}</value>
                         </systemProperty>
                         <systemProperty>
+                            <key>otp.validity.min</key>
+                            <value>${otp.validity.min}</value>
+                        </systemProperty>
+                        <systemProperty>
                             <key>webdriver.chrome.driver</key>
                             <value>${chrome.driver.path}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>webdriver.edge.driver</key>
+                            <value>${edge.driver.path}</value>
                         </systemProperty>
                         <systemProperty>
                             <key>cowin.website.url</key>
@@ -221,6 +259,30 @@
                         <systemProperty>
                             <key>instant.mail</key>
                             <value>${instant.mail}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>google.messages.auth.website.url</key>
+                            <value>${google.messages.auth.website.url}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>otp.phone.number</key>
+                            <value>${otp.phone.number}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>otp.senders</key>
+                            <value>${otp.senders}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>otp.message.space.index</key>
+                            <value>${otp.message.space.index}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>google.messages.auth.timeout.seconds</key>
+                            <value>${google.messages.auth.timeout.seconds}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>google.messages.convo.website.url</key>
+                            <value>${google.messages.convo.website.url}</value>
                         </systemProperty>
                     </systemProperties>
                 </configuration>
