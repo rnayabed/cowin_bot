@@ -202,6 +202,8 @@ public class WebScrapperTask extends TimerTask
             loadCowinWebsite();
             sendOTP();
 
+            sleep(3000);
+
             while(webDriver.getCurrentUrl().equals(url))
             {
                 otp = googleMessagesTask.getOTP();
