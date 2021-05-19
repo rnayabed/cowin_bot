@@ -508,9 +508,6 @@ public class WebScrapperTask extends TimerTask
                     paidFilterWebElement.click();
             }
         }
-
-
-        sleep(3000);
     }
 
     private int selectOption(String option, int oldVal)
@@ -594,7 +591,7 @@ public class WebScrapperTask extends TimerTask
 
     private void getAvailableVaccines(String pinCode, String stateName, String districtName)
     {
-        WebElement availabilityDateUl = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("availability-date-ul")));
+        WebElement availabilityDateUl = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("availability-date-ul")));
 
 
         if(nextButton == null)
