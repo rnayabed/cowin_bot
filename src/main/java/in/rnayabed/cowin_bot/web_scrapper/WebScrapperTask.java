@@ -329,7 +329,7 @@ public class WebScrapperTask extends TimerTask
     private void selectSearchByDistrictOrPin()
     {
 
-        WebElement statusSwitchElementDiv = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("status-switch")));
+        WebElement statusSwitchElementDiv = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("status-switch")));
 
         if(webDriver.findElements(By.className("mat-select-48")).size() == 0)
         {
@@ -433,7 +433,7 @@ public class WebScrapperTask extends TimerTask
     {
         if(pinSelectorBox == null)
         {
-            pinSelectorBox = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("pin-search")))
+            pinSelectorBox = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("pin-search")))
                     .findElement(By.tagName("input"));
         }
 
@@ -460,7 +460,7 @@ public class WebScrapperTask extends TimerTask
     {
         if(searchButton == null)
         {
-            searchButton = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("pin-search-btn")));
+            searchButton = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("pin-search-btn")));
 
             JavascriptExecutor executor = (JavascriptExecutor)webDriver;
             executor.executeScript("arguments[0].click();", searchButton);
@@ -474,7 +474,7 @@ public class WebScrapperTask extends TimerTask
 
         if(age18PlusFilterWebElement == null)
         {
-            WebElement filtersBlock = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("agefilterblock")));
+            WebElement filtersBlock = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("agefilterblock")));
 
             List<WebElement> filters = filtersBlock.findElements(By.className("form-check"));
 
@@ -623,7 +623,7 @@ public class WebScrapperTask extends TimerTask
         while(true)
         {
 
-            WebElement centersBox = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("center-box")))
+            WebElement centersBox = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("center-box")))
                     .findElement(By.tagName("div"));
 
             if(centersBox.findElements(By.tagName("ion-item")).size() == 1)
