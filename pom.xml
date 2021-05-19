@@ -22,8 +22,12 @@
         <main.class.name>in.rnayabed.cowin_bot.Main</main.class.name>
 
         <gecko.driver.path>D:/tools/geckodriver.exe</gecko.driver.path>
+
         <chrome.driver.path>/usr/bin/chromedriver</chrome.driver.path>
+
         <edge.driver.path>D:/tools/msedgedriver.exe</edge.driver.path>
+        <browser.user.data.dir>C:\Users\Debayan Sutradhar\AppData\Local\Microsoft\Edge\User Data\</browser.user.data.dir>
+        <browser.profile>Default</browser.profile>
 
         <browser.run.headless>false</browser.run.headless>
 
@@ -36,7 +40,7 @@
         <google.messages.auth.website.url>https://messages.google.com/web/authentication</google.messages.auth.website.url>
         <google.messages.convo.website.url>https://messages.google.com/web/authentication</google.messages.convo.website.url>
 
-        <search.type>PIN</search.type>
+        <search.type>STATE_DISTRICT</search.type>
 
         <search.pins>788806</search.pins>
 
@@ -47,8 +51,8 @@
 
         <google.messages.auth.timeout.seconds>200</google.messages.auth.timeout.seconds>
         <otp.phone.number>9903299105</otp.phone.number>
-        <otp.senders>AX-NHPSMS</otp.senders>
-        <otp.validity.min>3</otp.validity.min>
+        <otp.senders>AX-NHPSMS,JD-NHPSMS</otp.senders>
+        <otp.validity.min>2</otp.validity.min>
         <otp.message.space.index>6</otp.message.space.index>
 
         <timeout.seconds>10</timeout.seconds>
@@ -155,6 +159,14 @@
                         <systemProperty>
                             <key>webdriver.gecko.driver</key>
                             <value>${gecko.driver.path}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>browser.user.data.dir</key>
+                            <value>${browser.user.data.dir}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <key>browser.profile</key>
+                            <value>${browser.profile}</value>
                         </systemProperty>
                         <systemProperty>
                             <key>otp.validity.min</key>

@@ -5,9 +5,7 @@ import in.rnayabed.cowin_bot.exception.BotException;
 import in.rnayabed.cowin_bot.vaccine.SearchFilter;
 import in.rnayabed.cowin_bot.vaccine.SearchType;
 import in.rnayabed.cowin_bot.vaccine.Vaccine;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
@@ -29,6 +27,9 @@ public class WebScrapperTask extends TimerTask
     private String[] districts;
     private String[] pins;
     private String dateLimit;
+
+    private String browserUserDataDirectory;
+    private String browserProfile;
 
     private WebDriver webDriver;
     private WebDriverWait webDriverWait;
@@ -72,6 +73,9 @@ public class WebScrapperTask extends TimerTask
 
         this.authWebsite = System.getProperty("google.messages.auth.website.url");
         this.convoWebsite = System.getProperty("google.messages.convo.website.url");
+        this.browserUserDataDirectory = System.getProperty("browser.user.data.dir");
+        this.browserProfile = System.getProperty("browser.profile");
+
         this.phoneNumber = System.getProperty("otp.phone.number");
         this.googleMessagesAuthTimeoutInSeconds = Integer.parseInt(System.getProperty("google.messages.auth.timeout.seconds"));
 
@@ -137,7 +141,9 @@ public class WebScrapperTask extends TimerTask
                 chromeOptions.addArguments("--headless","--start-maximized");
             }
 
-            chromeOptions.addArguments("--window-size="+windowWidth+","+windowHeight, "user-data-dir=D:/webdriver/chrome-user-dir");
+            chromeOptions.addArguments("--window-size="+windowWidth+","+windowHeight,
+                    "user-data-dir="+browserUserDataDirectory,
+                    "profile-directory="+browserProfile);
 
             webDriver = new ChromeDriver(chromeOptions);
         }
@@ -153,7 +159,9 @@ public class WebScrapperTask extends TimerTask
                 edgeOptions.addArguments("--start-maximized");
             }
 
-            edgeOptions.addArguments("--window-size="+windowWidth+","+windowHeight, "user-data-dir=D:/webdriver/chrome-user-dir");
+            edgeOptions.addArguments("--window-size="+windowWidth+","+windowHeight,
+                    "user-data-dir="+browserUserDataDirectory,
+                    "profile-directory="+browserProfile);
 
             webDriver = new EdgeDriver(edgeOptions);
         }
@@ -186,7 +194,7 @@ public class WebScrapperTask extends TimerTask
 
             thisTabHandle = webDriver.getWindowHandle();
 
-            googleMessagesTask = new GoogleMessagesTask(webDriver, phoneNumber, googleMessagesAuthTimeoutInSeconds,
+            googleMessagesTask = new GoogleMessagesTask(webDriver, webDriverWait, phoneNumber, googleMessagesAuthTimeoutInSeconds,
                     authWebsite, convoWebsite, senders, otpIndex, otpValidityMin);
 
             googleMessagesTask.load();
@@ -194,31 +202,47 @@ public class WebScrapperTask extends TimerTask
             loadCowinWebsite();
             sendOTP();
 
-            otp = googleMessagesTask.getOTP();
-
-
-            if(otp != null)
+            while(webDriver.getCurrentUrl().equals(url))
             {
-                isLoggedIn = true;
+                otp = googleMessagesTask.getOTP();
 
-                getLogger().info("Successfully obtained OTP : "+otp);
-            }
-            else
-            {
-                webDriver.close();
-                return;
+
+                if(otp != null)
+                {
+                    isLoggedIn = true;
+
+                    getLogger().info("Successfully obtained OTP : "+otp);
+                }
+                else
+                {
+                    webDriver.close();
+                    return;
+                }
+
+
+                sleep(3000);
+
+                webDriver.switchTo().window(getThisTabHandle());
+                WebElement otpInputBox = webDriver.findElement(By.tagName("input"));
+
+                otpInputBox.sendKeys(otp);
+
+                WebElement button = webDriver.findElement(By.tagName("ion-button"));
+
+                JavascriptExecutor executor = (JavascriptExecutor)webDriver;
+                executor.executeScript("arguments[0].click();", button);
+
+                sleep(2000);
             }
 
 
             sleep(3000);
+            webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("btnlist")))
+                    .findElement(By.tagName("a"))
+                    .click();
 
-            webDriver.switchTo().window(getThisTabHandle());
-            WebElement otpInputBox = webDriver.findElement(By.tagName("input"));
+            sleep(5000);
 
-            otpInputBox.sendKeys(otp);
-
-            WebElement button = webDriver.findElement(By.tagName("ion-button"));
-            button.click();
 
 
             selectSearchByDistrictOrPin();
@@ -349,11 +373,20 @@ public class WebScrapperTask extends TimerTask
     {
         if(stateSelectorBox == null)
         {
-            WebElement searchdistwrperDiv = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("searchdistwrper")));
-            List<WebElement> selectorDivs = searchdistwrperDiv.findElements(By.className("pullleft"));
+            List<WebElement> matSelects = webDriverWait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.tagName("mat-select")));
 
-            stateSelectorBox = selectorDivs.get(0).findElement(By.tagName("mat-select"));
-            districtSelectorBox = selectorDivs.get(1).findElement(By.tagName("mat-select"));
+            for(WebElement element : matSelects)
+            {
+                if(element.getAttribute("formcontrolname").equals("state_id"))
+                {
+                    stateSelectorBox = element;
+                }
+
+                if(element.getAttribute("formcontrolname").equals("district_id"))
+                {
+                    districtSelectorBox = element;
+                }
+            }
         }
 
         String alreadyPresent = stateSelectorBox
@@ -366,7 +399,7 @@ public class WebScrapperTask extends TimerTask
         {
             stateSelectorBox.click();
 
-            int stateFound = selectOption(stateName,"mat-select-0-panel", -1);
+            int stateFound = selectOption(stateName, -1);
 
             if(stateFound == -1)
             {
@@ -375,11 +408,13 @@ public class WebScrapperTask extends TimerTask
         }
 
 
+        sleep(1000);
+
         districtSelectorBox.click();
 
         int oldVal = districtHashMap.getOrDefault(districtName, -1);
 
-        int districtFound = selectOption(districtName,"mat-select-2-panel", oldVal);
+        int districtFound = selectOption(districtName, oldVal);
 
         if(districtFound == -1)
         {
@@ -412,6 +447,7 @@ public class WebScrapperTask extends TimerTask
     private WebElement age45PlusFilterWebElement = null;
     private WebElement covishieldFilterWebElement = null;
     private WebElement covaxinFilterWebElement = null;
+    private WebElement sputnikVFilterWebElement = null;
     private WebElement freeFilterWebElement = null;
     private WebElement paidFilterWebElement = null;
 
@@ -422,8 +458,10 @@ public class WebScrapperTask extends TimerTask
     {
         if(searchButton == null)
         {
-            searchButton = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("pinbtncover")))
-                    .findElement(By.tagName("button"));
+            searchButton = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("pin-search-btn")));
+
+            JavascriptExecutor executor = (JavascriptExecutor)webDriver;
+            executor.executeScript("arguments[0].click();", searchButton);
         }
 
 
@@ -436,14 +474,15 @@ public class WebScrapperTask extends TimerTask
         {
             WebElement filtersBlock = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("agefilterblock")));
 
-            List<WebElement> filters = filtersBlock.findElements(By.className("form-check-label"));
+            List<WebElement> filters = filtersBlock.findElements(By.className("form-check"));
 
             age18PlusFilterWebElement = filters.get(0);
             age45PlusFilterWebElement = filters.get(1);
             covishieldFilterWebElement = filters.get(2);
             covaxinFilterWebElement = filters.get(3);
-            freeFilterWebElement = filters.get(4);
-            paidFilterWebElement = filters.get(5);
+            sputnikVFilterWebElement = filters.get(4);
+            freeFilterWebElement = filters.get(5);
+            paidFilterWebElement = filters.get(6);
         }
 
 
@@ -459,6 +498,8 @@ public class WebScrapperTask extends TimerTask
                     covishieldFilterWebElement.click();
                 else if(searchFilter == SearchFilter.COVAXIN)
                     covaxinFilterWebElement.click();
+                else if(searchFilter == SearchFilter.SPUTNIKV)
+                    sputnikVFilterWebElement.click();
                 else if(searchFilter == SearchFilter.FREE)
                     freeFilterWebElement.click();
                 else if(searchFilter == SearchFilter.PAID)
@@ -467,9 +508,9 @@ public class WebScrapperTask extends TimerTask
         }
     }
 
-    private int selectOption(String option, String selectorIdName, int oldVal)
+    private int selectOption(String option, int oldVal)
     {
-        WebElement selectorPanel = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id(selectorIdName)));
+        WebElement selectorPanel = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("mat-select-panel")));
 
         List<WebElement> options = selectorPanel.findElements(By.tagName("mat-option"));
 
@@ -504,26 +545,26 @@ public class WebScrapperTask extends TimerTask
     {
         try
         {
-//            if(districts.length > 1 || pins.length > 1)
-//            {
-//                if(searchType == SearchType.STATE_DISTRICT)
-//                    chooseStateDistrictAndTypeAndFinallySearchAndGetAvailableVaccines(state, districts);
-//                else if(searchType == SearchType.PIN)
-//                    choosePinAndTypeAndFinallySearchAndGetAvailableVaccines(pins);
-//            }
-//            else
-//            {
-//                search();
-//
-//                if(searchType == SearchType.STATE_DISTRICT)
-//                    getAvailableVaccines(state, districts[0]);
-//                else
-//                    getAvailableVaccines(pins[0]);
-//            }
+            if(districts.length > 1 || pins.length > 1)
+            {
+                if(searchType == SearchType.STATE_DISTRICT)
+                    chooseStateDistrictAndTypeAndFinallySearchAndGetAvailableVaccines(state, districts);
+                else if(searchType == SearchType.PIN)
+                    choosePinAndTypeAndFinallySearchAndGetAvailableVaccines(pins);
+            }
+            else
+            {
+                search();
+
+                if(searchType == SearchType.STATE_DISTRICT)
+                    getAvailableVaccines(state, districts[0]);
+                else
+                    getAvailableVaccines(pins[0]);
+            }
 
 
 
-//            getLogger().info("Repeating after "+System.getProperty("repeat.millis")+" millis ...");
+            getLogger().info("Repeating after "+System.getProperty("repeat.millis")+" millis ...");
         }
         catch (Exception e)
         {
@@ -581,10 +622,14 @@ public class WebScrapperTask extends TimerTask
         {
 
             WebElement centersBox = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("center-box")))
-                    .findElement(By.tagName("div"))
                     .findElement(By.tagName("div"));
 
-            List<WebElement> centersBoxElements = centersBox.findElements(By.tagName("div"));
+            if(centersBox.findElements(By.tagName("ion-item")).size() == 1)
+                break;
+
+            WebElement sub = centersBox.findElement(By.tagName("div"));
+
+            List<WebElement> centersBoxElements = sub.findElements(By.tagName("div"));
 
             if(centersBoxElements.isEmpty())
             {
@@ -718,7 +763,19 @@ public class WebScrapperTask extends TimerTask
             if(dateReached)
                 break;
 
-            nextButton.click();
+            while(true)
+            {
+                try
+                {
+                    nextButton.click();
+                    break;
+                }
+                catch (ElementClickInterceptedException e)
+                {
+                    sleep(500);
+                }
+            }
+
             stepCount++;
         }
 
