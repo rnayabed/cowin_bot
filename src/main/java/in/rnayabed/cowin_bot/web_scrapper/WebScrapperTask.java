@@ -508,6 +508,9 @@ public class WebScrapperTask extends TimerTask
                     paidFilterWebElement.click();
             }
         }
+
+
+        sleep(3000);
     }
 
     private int selectOption(String option, int oldVal)
