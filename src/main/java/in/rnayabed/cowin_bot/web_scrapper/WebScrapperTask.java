@@ -629,7 +629,9 @@ public class WebScrapperTask extends TimerTask
             if(centersBox.findElements(By.tagName("ion-item")).size() == 1)
                 break;
 
-            WebElement sub = centersBox.findElement(By.tagName("div"));
+            WebElement sub = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(
+                    By.tagName("div")
+            ));
 
             List<WebElement> centersBoxElements = sub.findElements(By.tagName("div"));
 

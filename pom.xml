@@ -25,11 +25,11 @@
 
         <chrome.driver.path>/usr/bin/chromedriver</chrome.driver.path>
 
-        <edge.driver.path>D:/tools/msedgedriver.exe</edge.driver.path>
+        <edge.driver.path>D:\tools\Selenium Webdrivers\msedgedriver.exe</edge.driver.path>
         <browser.user.data.dir>C:\Users\Debayan Sutradhar\AppData\Local\Microsoft\Edge\User Data\</browser.user.data.dir>
         <browser.profile>Default</browser.profile>
 
-        <browser.run.headless>false</browser.run.headless>
+        <browser.run.headless>true</browser.run.headless>
 
         <browser.choice>EDGE</browser.choice>
 
