@@ -89,12 +89,23 @@ public class GoogleMessagesTask
                     {
                         if(sender.equals(reqSender))
                         {
-                            if(!timeElement.getText().equals("Now"))
+                            String timeElementText = timeElement.getText();
+
+                            if(!timeElementText.equals("Now"))
                             {
                                 String min = timeElement.getText().split(" ")[0];
 
-                                if(Integer.parseInt(min.strip()) >= otpValidityMin)
+                                try
+                                {
+                                    if(Integer.parseInt(min.strip()) >= otpValidityMin)
+                                        continue;
+                                }
+                                catch (NumberFormatException e)
+                                {
+                                    getLogger().info("Skipping message with time '"+timeElementText+"' because" +
+                                            "it is not in minutes");
                                     continue;
+                                }
                             }
 
                             String text = contentElement.getText().split(" ")[otpIndex];

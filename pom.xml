@@ -6,13 +6,13 @@
 
     <groupId>in.rnayabed</groupId>
     <artifactId>cowin_bot</artifactId>
-    <version>3.0.0</version>
+    <version>3.1.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
 
-        <bot.version>3.0.0</bot.version>
+        <bot.version>3.1.0</bot.version>
         <bot.repo>https://github.com/rnayabed/cowin_bot</bot.repo>
 
 
@@ -29,7 +29,7 @@
         <browser.user.data.dir>C:\Users\Debayan Sutradhar\AppData\Local\Microsoft\Edge\User Data\</browser.user.data.dir>
         <browser.profile>Default</browser.profile>
 
-        <browser.run.headless>true</browser.run.headless>
+        <browser.run.headless>false</browser.run.headless>
 
         <browser.choice>EDGE</browser.choice>
 
@@ -44,8 +44,8 @@
 
         <search.pins>788806</search.pins>
 
-        <search.state>West Bengal</search.state>
-        <search.districts>South 24 Parganas, Kolkata</search.districts>
+        <search.state>Andaman and Nicobar Islands</search.state>
+        <search.districts>Nicobar</search.districts>
         <search.date.limit></search.date.limit> <!--Example:6 May 2021-->
         <search.filters></search.filters>
 
@@ -61,8 +61,8 @@
         <javax.mail.version>1.6.2</javax.mail.version>
 
         <mail.smtp.user>cowin.bot.rnayabed@gmail.com</mail.smtp.user>
-        <mail.smtp.user.pass></mail.smtp.user.pass>
-        <mail.smtp.to>debayansutradhar3@gmail.com, gautambhel@gmail.com, debadityasx4prophet@gmail.com, shampasutradhar@gmail.com</mail.smtp.to>
+        <mail.smtp.user.pass>newPasswordReallyBig</mail.smtp.user.pass>
+        <mail.smtp.to>debayansutradhar3@gmail.com</mail.smtp.to>
         <mail.smtp.host>smtp.gmail.com</mail.smtp.host>
         <mail.smtp.port>587</mail.smtp.port>
 

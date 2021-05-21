@@ -120,7 +120,7 @@ public class Mail extends TimerTask
                         .append("Center Address: ").append(vaccine.getCenterAddress()).append("\n")
                         .append("Vaccine Name: ").append(vaccine.getVaccineName()).append("\n")
                         .append("Amount Left: ").append(vaccine.getAmountLeft()).append("\n")
-                        .append("Limit: ").append(vaccine.getAgeLimit());
+                        .append("Limit: ").append(vaccine.getAgeLimit()).append("\n\n");
             }
 
             stringBuilder.append("\n\n\n");

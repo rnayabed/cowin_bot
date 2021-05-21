@@ -227,12 +227,12 @@ public class WebScrapperTask extends TimerTask
                 webDriver.switchTo().window(getThisTabHandle());
                 WebElement otpInputBox = webDriver.findElement(By.tagName("input"));
 
+                otpInputBox.clear();
                 otpInputBox.sendKeys(otp);
 
                 WebElement button = webDriver.findElement(By.tagName("ion-button"));
 
-                JavascriptExecutor executor = (JavascriptExecutor)webDriver;
-                executor.executeScript("arguments[0].click();", button);
+                click(button);
 
                 sleep(2000);
             }
@@ -336,7 +336,7 @@ public class WebScrapperTask extends TimerTask
             if(searchType == SearchType.STATE_DISTRICT)
             {
                 getLogger().log(Level.INFO, "Selecting search by district ...");
-                statusSwitchElementDiv.click();
+                click(statusSwitchElementDiv);
             }
         }
         else
@@ -344,7 +344,7 @@ public class WebScrapperTask extends TimerTask
             if(searchType == SearchType.PIN)
             {
                 getLogger().log(Level.INFO, "Selecting search by PIN ...");
-                statusSwitchElementDiv.click();
+                click(statusSwitchElementDiv);
             }
         }
     }
@@ -399,7 +399,9 @@ public class WebScrapperTask extends TimerTask
 
         if(!alreadyPresent.equalsIgnoreCase(stateName))
         {
-            stateSelectorBox.click();
+            getLogger().info("Selecting state selector box ...");
+
+            click(stateSelectorBox);
 
             int stateFound = selectOption(stateName, -1);
 
@@ -412,7 +414,9 @@ public class WebScrapperTask extends TimerTask
 
         sleep(1000);
 
-        districtSelectorBox.click();
+        getLogger().info("Selecting district ...");
+
+        click(districtSelectorBox);
 
         int oldVal = districtHashMap.getOrDefault(districtName, -1);
 
@@ -431,6 +435,8 @@ public class WebScrapperTask extends TimerTask
 
     private void choosePin(String pinCode)
     {
+        getLogger().info("Putting PIN ...");
+
         if(pinSelectorBox == null)
         {
             pinSelectorBox = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("pin-search")))
@@ -458,19 +464,21 @@ public class WebScrapperTask extends TimerTask
 
     private void search()
     {
+        getLogger().info("Searching ...");
+
         if(searchButton == null)
         {
             searchButton = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("pin-search-btn")));
 
-            JavascriptExecutor executor = (JavascriptExecutor)webDriver;
-            executor.executeScript("arguments[0].click();", searchButton);
+            click(searchButton);
         }
 
 
-        searchButton.click();
+        click(searchButton);
 
 
 
+        getLogger().info("Selecting filters ...");
 
         if(age18PlusFilterWebElement == null)
         {
@@ -493,19 +501,19 @@ public class WebScrapperTask extends TimerTask
             for(SearchFilter searchFilter : searchFilters)
             {
                 if(searchFilter == SearchFilter.AGE_18_PLUS)
-                    age18PlusFilterWebElement.click();
+                    click(age18PlusFilterWebElement);
                 else if(searchFilter == SearchFilter.AGE_45_PLUS)
-                    age45PlusFilterWebElement.click();
+                    click(age45PlusFilterWebElement);
                 else if (searchFilter == SearchFilter.COVISHIELD)
-                    covishieldFilterWebElement.click();
+                    click(covishieldFilterWebElement);
                 else if(searchFilter == SearchFilter.COVAXIN)
-                    covaxinFilterWebElement.click();
+                    click(covaxinFilterWebElement);
                 else if(searchFilter == SearchFilter.SPUTNIKV)
-                    sputnikVFilterWebElement.click();
+                    click(sputnikVFilterWebElement);
                 else if(searchFilter == SearchFilter.FREE)
-                    freeFilterWebElement.click();
+                    click(freeFilterWebElement);
                 else if(searchFilter == SearchFilter.PAID)
-                    paidFilterWebElement.click();
+                    click(paidFilterWebElement);
             }
         }
     }
@@ -531,7 +539,7 @@ public class WebScrapperTask extends TimerTask
 
             if(span.getText().equalsIgnoreCase(option))
             {
-                eachOption.click();
+                click(eachOption);
                 index = i;
                 break;
             }
@@ -591,11 +599,15 @@ public class WebScrapperTask extends TimerTask
 
     private void getAvailableVaccines(String pinCode, String stateName, String districtName)
     {
+        getLogger().info("Parsing Vaccine Data ...");
+
         WebElement availabilityDateUl = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("availability-date-ul")));
 
 
         if(nextButton == null)
         {
+            getLogger().info("Setting next button and prev button ...");
+
             nextButton = availabilityDateUl.findElement(By.className("carousel-control-next"));
 
             prevButton = availabilityDateUl.findElement(By.className("carousel-control-prev"));
@@ -605,8 +617,8 @@ public class WebScrapperTask extends TimerTask
 
         while(stepCount > 0)
         {
-
-            prevButton.click();
+            getLogger().info("click prev button ...");
+            click(prevButton);
             stepCount--;
         }
 
@@ -623,39 +635,38 @@ public class WebScrapperTask extends TimerTask
         while(true)
         {
 
+            getLogger().info("Sleep to wait everything to load ...");
+
+            sleep(2000);
             WebElement centersBox = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.className("center-box")))
                     .findElement(By.tagName("div"));
 
             if(centersBox.findElements(By.tagName("ion-item")).size() == 1)
                 break;
 
-            WebElement sub = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(
-                    By.tagName("div")
-            ));
-
-            List<WebElement> centersBoxElements = sub.findElements(By.tagName("div"));
-
-            if(centersBoxElements.isEmpty())
-            {
-
-                break;
-            }
+            List<WebElement> centersBoxElements = centersBox.findElement(By.tagName("mat-selection-list"))
+                    .findElements(By.tagName("mat-list-option"));
 
 
+
+
+
+            getLogger().info("Parsing dates ...");
 
             List<WebElement> dateElements = availabilityDateUl
                     .findElement(By.className("carousel-inner"))
                     .findElements(By.tagName("slide"));
 
 
-
             for(WebElement eachDateElement : dateElements)
             {
+                WebElement dateP = eachDateElement.findElement(By.tagName("p"));
 
-                String date = eachDateElement.findElement(By.tagName("p")).getText();
+                String dateInnerHTML = dateP.getAttribute("innerHTML");
 
-                if(date.isEmpty())
-                    break;
+                String date = dateInnerHTML.substring(0, dateInnerHTML.indexOf(" <span")) + " "
+                        + dateInnerHTML.substring(dateInnerHTML.indexOf(">")+1, dateInnerHTML.indexOf("</span>"));
+
 
                 if(!dateReached)
                 {
@@ -667,118 +678,111 @@ public class WebScrapperTask extends TimerTask
                 {
                     dateReached = true;
                 }
-
-
             }
 
 
 
+            getLogger().info("Parsing vaccine boxes ...");
 
             for(WebElement eachCenterElement : centersBoxElements)
             {
 
+                sleep(500);
+                List<WebElement> ionRows = eachCenterElement.findElements(By.tagName("ion-row"));
+                if(ionRows.isEmpty())
+                    continue;
 
-                List<WebElement> insideElement = eachCenterElement
-                        .findElements(By.tagName("div"));
+                List<WebElement> insideElements = ionRows.get(0).findElements(By.tagName("ion-col"));
 
 
-                if(insideElement.isEmpty())
+                if(insideElements.isEmpty())
                     continue;
 
 
-
-                List<WebElement> centerBoxes = insideElement.get(0).findElements(By.tagName("div"));
-
-                if(centerBoxes.isEmpty())
-                    continue;
+                WebElement centerBox = insideElements.get(0).findElement(By.className("row-disp"));
 
 
+                String centerName = centerBox.findElement(By.className("center-name-title")).getAttribute("innerHTML").replace("<!---->","");
 
-                WebElement centerBox = centerBoxes.get(0);
+                String centerAddress = centerBox.findElement(By.className("center-name-text")).getAttribute("innerHTML");
 
-
-                List<WebElement> centerNameTitles = centerBox.findElements(By.className("center-name-title"));
-
-                if(centerNameTitles.isEmpty())
-                    continue;
-
-
-                String centerName = centerNameTitles.get(0).getText();
-
-                String centerAddress = centerBox.findElement(By.className("center-name-text")).getText();
-
-                List<WebElement> slotAvWrap = insideElement.get(1).findElements(By.className("slot-available-wrap"));
+                List<WebElement> slotAvWrap = insideElements.get(1).findElements(By.className("slot-available-wrap"));
 
                 if(slotAvWrap.isEmpty())
                 {
                     continue;
                 }
 
-                List<WebElement> vaccineBoxes = slotAvWrap.get(0).findElements(By.className("vaccine-box"));
+
+                List<WebElement> vaccineBoxes = slotAvWrap.get(0).findElements(By.tagName("li"));
 
 
-                for(int i = 0;i< dates.size(); i++)
+                for(int i = 0;i< vaccineBoxes.size(); i++)
                 {
+                    sleep(100);
                     WebElement eachVaccineBox = vaccineBoxes.get(i);
-
-                    WebElement aElement = eachVaccineBox.findElement(By.tagName("a"));
-
-                    String amountLeft = aElement.getText();
-
-                    if(amountLeft.equals("Booked") || amountLeft.equals("NA"))
-                        continue;
-
-                    WebElement vaccineNameElement = eachVaccineBox.findElement(By.className("vaccine-cnt"));
-
-                    String vaccineName = vaccineNameElement.getText();
-
-
-                    WebElement ageLimitElement = eachVaccineBox.findElement(By.className("age-limit"));
-
-                    String ageLimit = ageLimitElement.getText();
-
 
                     String date = dates.get(i);
 
-                    Vaccine vaccine = new Vaccine(centerName, centerAddress, amountLeft, vaccineName, ageLimit);
+                    List<WebElement> divs = eachVaccineBox.findElements(By.className("slots-box"));
 
-                    vaccineHashMap.get(date).add(vaccine);
 
-                    if(instantMail)
+                    for(WebElement eachDiv: divs)
                     {
-                        instantMail = false;
 
-                        if(searchType == SearchType.STATE_DISTRICT)
+                        String elementClasses = eachDiv.getAttribute("class");
+                        if(elementClasses.contains("no-seat") || elementClasses.contains("no-available"))
+                            continue;
+
+
+
+                        WebElement aElement = eachDiv.findElement(By.tagName("a"));
+                        String amountLeft = aElement.getAttribute("innerHTML");
+
+
+
+                        WebElement vaccineNameElement = eachDiv.findElement(By.className("vaccine-cnt"))
+                                .findElement(By.tagName("h5"));
+
+                        String vaccineName = vaccineNameElement.getAttribute("innerHTML");
+
+
+
+                        WebElement ageLimitElement = eachDiv.findElement(By.className("age-limit"));
+
+                        String ageLimit = ageLimitElement.getAttribute("innerHTML");
+
+                        Vaccine vaccine = new Vaccine(centerName, centerAddress, amountLeft, vaccineName, ageLimit);
+
+                        vaccineHashMap.get(date).add(vaccine);
+
+                        if(instantMail)
                         {
-                            getLogger().info("INSTANT VACCINE AVAILABLE IN "+districtName+", "+stateName+" ...");
-                            new Timer().schedule(new Mail(stateName, districtName, date, vaccine), 0);
+                            instantMail = false;
+
+                            if(searchType == SearchType.STATE_DISTRICT)
+                            {
+                                getLogger().info("INSTANT VACCINE AVAILABLE IN "+districtName+", "+stateName+" ...");
+                                new Timer().schedule(new Mail(stateName, districtName, date, vaccine), 0);
+                            }
+                            else if(searchType == SearchType.PIN)
+                            {
+                                getLogger().info("INSTANT VACCINE AVAILABLE IN "+pinCode+" ...");
+                                new Timer().schedule(new Mail(pinCode, date, vaccine), 0);
+                            }
                         }
-                        else if(searchType == SearchType.PIN)
-                        {
-                            getLogger().info("INSTANT VACCINE AVAILABLE IN "+pinCode+" ...");
-                            new Timer().schedule(new Mail(pinCode, date, vaccine), 0);
-                        }
+
+                        vaccineFound=true;
                     }
-
-                    vaccineFound=true;
                 }
             }
 
             if(dateReached)
                 break;
 
-            while(true)
-            {
-                try
-                {
-                    nextButton.click();
-                    break;
-                }
-                catch (ElementClickInterceptedException e)
-                {
-                    sleep(500);
-                }
-            }
+            getLogger().info("Clicking next button ...");
+
+            click(nextButton);
 
             stepCount++;
         }
@@ -831,5 +835,18 @@ public class WebScrapperTask extends TimerTask
         {
             e.printStackTrace();
         }
+    }
+
+    private JavascriptExecutor javascriptExecutor = null;
+
+    private void click(WebElement element)
+    {
+
+        if (javascriptExecutor == null)
+        {
+            javascriptExecutor = (JavascriptExecutor) webDriver;
+        }
+
+        javascriptExecutor.executeScript("arguments[0].click();", element);
     }
 }
