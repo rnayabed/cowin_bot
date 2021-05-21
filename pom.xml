@@ -61,8 +61,8 @@
         <javax.mail.version>1.6.2</javax.mail.version>
 
         <mail.smtp.user>cowin.bot.rnayabed@gmail.com</mail.smtp.user>
-        <mail.smtp.user.pass>newPasswordReallyBig</mail.smtp.user.pass>
-        <mail.smtp.to>debayansutradhar3@gmail.com</mail.smtp.to>
+        <mail.smtp.user.pass></mail.smtp.user.pass>
+        <mail.smtp.to>debayansutradhar3@gmail.com, gautambhel@gmail.com, debadityasx4prophet@gmail.com, shampasutradhar@gmail.com</mail.smtp.to>
         <mail.smtp.host>smtp.gmail.com</mail.smtp.host>
         <mail.smtp.port>587</mail.smtp.port>
 
