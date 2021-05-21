@@ -501,19 +501,19 @@ public class WebScrapperTask extends TimerTask
             for(SearchFilter searchFilter : searchFilters)
             {
                 if(searchFilter == SearchFilter.AGE_18_PLUS)
-                    click(age18PlusFilterWebElement);
+                    age18PlusFilterWebElement.click();
                 else if(searchFilter == SearchFilter.AGE_45_PLUS)
-                    click(age45PlusFilterWebElement);
+                    age45PlusFilterWebElement.click();
                 else if (searchFilter == SearchFilter.COVISHIELD)
-                    click(covishieldFilterWebElement);
+                    covishieldFilterWebElement.click();
                 else if(searchFilter == SearchFilter.COVAXIN)
-                    click(covaxinFilterWebElement);
+                    covaxinFilterWebElement.click();
                 else if(searchFilter == SearchFilter.SPUTNIKV)
-                    click(sputnikVFilterWebElement);
+                    sputnikVFilterWebElement.click();
                 else if(searchFilter == SearchFilter.FREE)
-                    click(freeFilterWebElement);
+                    freeFilterWebElement.click();
                 else if(searchFilter == SearchFilter.PAID)
-                    click(paidFilterWebElement);
+                    paidFilterWebElement.click();
             }
         }
     }

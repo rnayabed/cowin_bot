@@ -2,7 +2,7 @@
 
 A webscrapper bot written in Java to keep track of real time vaccines from the CoWIN platform.
 
-![version](https://img.shields.io/badge/Version-2.0.0-green)
+![version](https://img.shields.io/badge/Version-3.1.1-green)
 
 ## Prerequisites
 
